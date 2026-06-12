@@ -21,4 +21,5 @@ from ec_site import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.IndexView.as_view()),
+    path('ec_site/', include('ec_site.urls')),
 ]

@@ -5,5 +5,8 @@ app_name = "ec_site"
 
 urlpatterns = [
     path("", views.IndexView.as_view()),
+    # path("",views.IndexView.as_view(), name = "main"),
+    path("userLogin/", views.UserLogin.as_view(), name="user_login"),
+    path("searchResult/", views.SearchResult.as_view(), name="search_result"),
     # path("articleCreate/", views.ArticleCreate.as_view(), name="article_create"),
 ]
