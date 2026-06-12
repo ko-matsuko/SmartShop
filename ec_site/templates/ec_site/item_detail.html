@@ -1,0 +1,56 @@
+{% load static %}
+<html>
+	<head>
+		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+		<title>商品詳細</title>
+		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
+	</head>
+    <body>
+        <h1>商品の詳細表示</h1>
+
+        <div class="item_detail">
+            <table border="1">
+                <tr>
+                    <td>商品名</td>
+                    <th>{{item.name}}</th>
+                </tr>
+                <tr>
+                    <td>商品の色</td>
+                    <th>{{item.color}}</th>
+                </tr>
+                <tr>
+                    <td>メーカー名</td>
+                    <th>{{item.manufacturer}}</th>
+                </tr>
+                <tr>
+                    <td>価格</td>
+                    <th>{{item.price}}</th>
+                </tr>
+                <tr>
+                    <td>在庫数</td>
+                    <th>{{item.stock}}</th>
+                </tr>
+            </table>
+        </div>
+
+        <div class="item_purchase">
+            <form action="{% url 'ec_site:cart' item.item_id %}" method='POST'>
+            {% csrf_token %}
+            <tr>
+                <th>数量</th>
+                <td>
+                    <select name = "amount" id = "amount">
+                        {% for i in num_list %}
+                        <option value="{{i}}">{{i}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+
+            <input type="submit" value="ショッピングカートに入れる"/>
+        </form>
+        </div>
+        
+    </body>
+
+</html>

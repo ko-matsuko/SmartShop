@@ -33,6 +33,7 @@ class SearchFormKeyword(forms.Form):
         # if len(value) < 4:
         #     raise forms.ValidationError("%(min_length)s 文字以上で入力してください", params={"min_length":4})
         return value
+    
 
 
 # class UserCreateForm(forms.Form):

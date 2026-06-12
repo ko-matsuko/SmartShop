@@ -21,31 +21,6 @@ class IndexView(View):
     #     if request["flag"]:
 
     
-class UserLogin(View):
-    def get(self, request, *args, **kwargs):
-        form = UserLoginForm()
-        context = {
-            "form": form
-        }
-        return render(request, "ec_site/login.html", context)
-    
-    def post(self, request, *args, **kwargs):
-        form = UserLoginForm(request.POST)
-
-        if not form.is_valid():
-            context = {
-                "form": form
-            }
-            return render(request, "ec_site/login.html", context)
-        
-        name = form.cleaned_data["name"]
-        flag = True
-        context = {
-            "name": name,
-            "flag": flag,
-        }
-        return render(request, "ec_site/main.html", context)
-    
 class SearchResult(View):
     def get(self, request, *args, **kwargs):
         return render(request, "ec_site/search_result.html")
@@ -73,34 +48,61 @@ class SearchResult(View):
             "item_list": queryset
         }
         return render(request, "ec_site/search_result.html", context)
+    
+class ItemDetail(View):
+    def get(self, request, pk):
+        queryset = ShoppingItem.objects.get(pk=pk)
 
-    # def post(self, request, *args, **kwargs):
-    #     ShopCat = ShoppingCategory().objects.get(pk=request.POST[""])
+        stock_num_list = []
+        if queryset.stock > 0:
+            for i in range(0, queryset.stock):
+                stock_num_list.append(i+1)
 
+        context = {
+            "item": queryset,
+            "num_list": stock_num_list,
+        }
+        return render(request, "ec_site/item_detail.html", context)
 
-# class ArticleCreate(View):
-#     def get(self, request, *args, **kwargs):
-#         pass
+class Cart(View):
+    def get(self, request):
+        return render(request, "ec_site/cart.html")
+    
+    def post(self, request, pk):
+        queryset = ShoppingItem.objects.get(pk=pk)
+        item_amount = request.POST["amount"]
+        charge = int(queryset.price)*int(item_amount)
 
-#     def post(self, request, *args, **kwargs):
-#         form = ArticleCreateForm(request.POST)
-#         if not form.is_valid():
-#             queryset = Article.objects.all().order_by("-created_at")
-#             context = {
-#                 "form": form,
-#                 "article_list": queryset,
-#             }
-#             return render(request, "message/board.html", context)
-#         new_article = Article()
-#         new_article.name = form.cleaned_data.get("name")
-#         new_article.content = form.cleaned_data.get("content")
-#         new_article.password = form.cleaned_data.get("password")
-#         new_article.save()
-#         # 画面に入力した内容をクリアするためformを生成
-#         form = ArticleCreateForm()
-#         queryset = Article.objects.all().order_by("-created_at")
-#         context = {
-#             "form": form,
-#             "article_list": queryset,
-#         }
-#         return render(request, "message/board.html", context)
+        print(queryset.price, item_amount, end="")
+
+        context = {
+            "item": queryset,
+            "amount": item_amount,
+            "charge": charge,
+        }
+        return render(request, "ec_site/cart.html", context)
+
+class UserLogin(View):
+    def get(self, request, *args, **kwargs):
+        form = UserLoginForm()
+        context = {
+            "form": form
+        }
+        return render(request, "ec_site/login.html", context)
+    
+    def post(self, request, *args, **kwargs):
+        form = UserLoginForm(request.POST)
+
+        if not form.is_valid():
+            context = {
+                "form": form
+            }
+            return render(request, "ec_site/login.html", context)
+        
+        name = form.cleaned_data["name"]
+        flag = True
+        context = {
+            "name": name,
+            "flag": flag,
+        }
+        return render(request, "ec_site/main.html", context)

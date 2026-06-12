@@ -20,7 +20,7 @@
 					</tr>
 					{% for item in item_list %}
 					<tr>
-						<td>{{item.name}}</td>
+						<td><a href="/ec_site/itemDetail/{{item.item_id}}">{{item.name}}</a></td>
 						<td>{{item.color}}</td>
 						<td>{{item.manufacturer}}</td>
 						<td>{{item.price}}</td>
