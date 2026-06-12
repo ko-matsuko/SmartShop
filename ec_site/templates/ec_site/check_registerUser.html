@@ -1,0 +1,39 @@
+{% load static %}
+<html>
+	<head>
+		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+		<title>会員登録の確認</title>
+		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
+	</head>
+    <body>
+        <h1>以下の情報で登録しますか？</h1>
+
+        <div class="check_register_user">
+            <form action="{% url 'ec_site:check_registerUser' %}" method="POST">
+                {% csrf_token %}
+                <table border="1">
+                    <tr>
+                        <th>会員ID:</th>
+                        <td>{{user_id}}</td>
+                    </tr>
+                    <tr>
+                        <th>パスワード:</th>
+                        <td>{{password}}</td>
+                    </tr>
+                    <tr>
+                        <th>名前:</th>
+                        <td>{{name}}</td>
+                    </tr>
+                    <tr>
+                        <th>ご住所:</th>
+                        <td>{{address}}</td>
+                    </tr>
+                </table>
+                <input type="hidden" name="user_id" value="{{ user_id }}">
+                <input type="hidden" name="password" value="{{ password }}">
+                <input type="hidden" name="name" value="{{ name }}">
+                <input type="hidden" name="address" value="{{ address }}">
+                <input type="submit" value="登録">
+            </form>
+        </div>
+    </body>

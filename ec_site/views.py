@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 from django.views import generic
 from django.views.generic import View
-from ec_site.models import ShoppingCategory,ShoppingItem
-from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword
+from ec_site.models import ShoppingCategory,ShoppingItem, AccountUser
+from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, CreateUserForm
 
 
 class IndexView(View):
@@ -73,8 +73,6 @@ class Cart(View):
         item_amount = request.POST["amount"]
         charge = int(queryset.price)*int(item_amount)
 
-        print(queryset.price, item_amount, end="")
-
         context = {
             "item": queryset,
             "amount": item_amount,
@@ -90,19 +88,74 @@ class UserLogin(View):
         }
         return render(request, "ec_site/login.html", context)
     
+    # def post(self, request, *args, **kwargs):
+    #     form = UserLoginForm(request.POST)
+
+    #     if not form.is_valid():
+    #         context = {
+    #             "form": form
+    #         }
+    #         return render(request, "ec_site/login.html", context)
+        
+    #     name = form.cleaned_data["name"]
+    #     flag = True
+    #     context = {
+    #         "name": name,
+    #         "flag": flag,
+    #     }
+    #     return render(request, "ec_site/main.html", context)
+
+class RegisterUser(View):
+    def get(self, request, *args, **kwargs):
+        form = CreateUserForm()
+        context = {
+            "form": form
+        }
+        return render(request, "ec_site/registerUser.html",context)
+    
     def post(self, request, *args, **kwargs):
-        form = UserLoginForm(request.POST)
+        form = CreateUserForm(request.POST)
 
         if not form.is_valid():
             context = {
                 "form": form
             }
-            return render(request, "ec_site/login.html", context)
+            return render(request, "ec_site/registerUser.html",context)
         
-        name = form.cleaned_data["name"]
-        flag = True
+        user = AccountUser()
+        user.user_id = form.cleaned_data.get("user_id")
+        user.password = form.cleaned_data.get("password")
+        user.name = form.cleaned_data.get("name")
+        user.address = form.cleaned_data.get("address")
+
         context = {
-            "name": name,
-            "flag": flag,
+            "user_id": user.user_id,
+            "password": user.password,
+            "name": user.name,
+            "address": user.address,
         }
-        return render(request, "ec_site/main.html", context)
+
+        return render(request, "ec_site/check_registerUser.html", context)
+        
+class CheckRegisterUser(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, "ec_site/check_registerUser.html")
+    
+    def post(self, request, *args, **kwargs):
+        # form = CreateUserForm(request.POST)
+        user = AccountUser()
+        user.user_id = request.POST["user_id"]
+        user.password = request.POST["password"]
+        user.name = request.POST["name"]
+        user.address = request.POST["address"]
+        user.save()
+
+        context = {
+            "name": user.name
+        }
+        return render(request, "ec_site/registerUserCommit.html",context)
+        
+
+class RegisterUserCommit(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, "ec_site/check_registerUser.html")

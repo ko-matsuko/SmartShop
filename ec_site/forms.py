@@ -34,15 +34,32 @@ class SearchFormKeyword(forms.Form):
         #     raise forms.ValidationError("%(min_length)s 文字以上で入力してください", params={"min_length":4})
         return value
     
+class CreateUserForm(forms.Form):
+    user_id = forms.CharField(label = "会員ID:", max_length=128)
+    password = forms.CharField(label = "パスワード:", max_length=256)
+    password_check = forms.CharField(label = "パスワード:", max_length=256)
+    name = forms.CharField(label="お名前:", max_length=128)
+    address = forms.CharField(label="ご住所:", max_length=256)
 
+    def clean_user_id(self):
+        user_id = self.cleaned_data["user_id"]
+        
+        if AccountUser.objects.filter(user_id = user_id).exists():
+            raise forms.ValidationError("そのユーザIDは既に存在します")
+        return user_id
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        user_id = cleaned_data.get('user_id')
+        password1 = cleaned_data.get('password')
+        password2 = cleaned_data.get('password_check')
 
-# class UserCreateForm(forms.Form):
-#     name = forms.CharField(label = "ユーザ名", max_length=255)
-#     password = forms.CharField(label = "ユーザパスワード", max_length=255)
+        if AccountUser.objects.filter(user_id = user_id).exists():
+            raise forms.ValidationError("そのユーザIDは既に存在します")
+        
+        if password1 != password2:
+            raise forms.ValidationError("パスワードと確認用パスワードが一致しません")
+        
+        return cleaned_data
+    
 
-#     def clean_password(self):
-#         value = self.cleaned_data["password"]
-
-#         if len(value) < 4:
-#             raise forms.ValidationError("%(min_length)s 文字以上で入力してください", params={"min_length":4})
-#         return value
