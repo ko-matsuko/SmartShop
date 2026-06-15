@@ -16,13 +16,24 @@
             </tr>
             <input type='submit' value='検索' />
             </form>
-
-            
         </div>
         <br>
         <div class="links">
             <a href="/ec_site/checkCart/">ショッピングカートを見る</a><br><br>
-            <a href="/ec_site/userLogin/">ログイン</a><br><br>
+        </div>
+        <br><br>
+        <div class="nonlogin_only">
+            {% if not request.session.is_login %}
+                <a href="/ec_site/userLogin/">ログイン</a><br><br>
+            {% endif %}
+        </div>
+        <div class="login_only">
+            {% if request.session.is_login %}
+                <h3>ようこそ{{request.session.name}}さん</h3><br>
+                <a href="/ec_site/registerUser/">ここに会員登録の確認</a><br>
+                <a href="/ec_site/registerUser/">ここに会員登録の変更</a><br>
+                <a href="/ec_site/userLogout/">ここにログアウト</a><br>
+            {% endif %}        
         </div>
 	</body>
 </html>

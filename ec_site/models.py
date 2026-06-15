@@ -13,6 +13,9 @@ class AccountUser(models.Model):
     name = models.CharField(verbose_name="名前",max_length=128)
     address = models.CharField(verbose_name="住所",max_length=256)
 
+    def __str__(self):
+        return self.user_id
+
 
 
 class ShoppingCategory(models.Model):

@@ -36,8 +36,8 @@ class SearchResult(View):
         keyword = form_keyword.cleaned_data.get("keyword")
 
         category = ShoppingCategory.objects.get(name = category_name)
-        # queryset = ShoppingItem.objects.filter(category = category.category_id, name__icontains = keyword)
-        queryset = ShoppingItem.objects.filter(category = category.category_id)
+        queryset = ShoppingItem.objects.filter(category = category.category_id, name__icontains = keyword)
+        # queryset = ShoppingItem.objects.filter(category = category.category_id)
 
 
         print(category.category_id, queryset, end="\n")
@@ -69,24 +69,63 @@ class Cart(View):
         return render(request, "ec_site/cart.html")
     
     def post(self, request, pk):
-        queryset = ShoppingItem.objects.get(pk=pk)
-        item_amount = request.POST["amount"]
-        charge = int(queryset.price)*int(item_amount)
+        if not request.session.get('is_login', None):
+            return redirect('/ec_site/userLogin')
+        else:
+            queryset = ShoppingItem.objects.get(pk=pk)
+            item_amount = request.POST["amount"]
+            charge = int(queryset.price)*int(item_amount)
 
-        context = {
-            "item": queryset,
-            "amount": item_amount,
-            "charge": charge,
-        }
-        return render(request, "ec_site/cart.html", context)
+            context = {
+                "item": queryset,
+                "amount": item_amount,
+                "charge": charge,
+            }
+            return render(request, "ec_site/cart.html", context)
 
 class UserLogin(View):
     def get(self, request, *args, **kwargs):
-        form = UserLoginForm()
-        context = {
-            "form": form
-        }
-        return render(request, "ec_site/login.html", context)
+        if request.session.get('is_login', None):
+            return redirect('/')
+        
+        login_form = UserLoginForm()
+        return render(request, "ec_site/login.html", locals())
+        
+    def post(self, request, *args, **kwargs):
+        login_form = UserLoginForm(request.POST)
+        # message = '入力した内容を再度確認してください'
+        if login_form.is_valid():
+            user_id = login_form.cleaned_data.get('user_id')
+            request.session['is_login'] = True
+            request.session['user_id'] = user_id
+            
+            
+            user = AccountUser.objects.get(user_id=user_id)
+            request.session["name"] = user.name
+            return redirect('/')
+        else:
+            context = {
+                "login_form": login_form
+            }
+            return render(request, 'ec_site/login.html', context)
+        
+class UserLogout(View):
+    def get(self, request, *args, **kwargs):
+        if not request.session.get('is_login', None):
+            return redirect('/')
+        request.session.flush()
+        return redirect('/')
+
+
+
+
+
+    # def get(self, request, *args, **kwargs):
+    #     form = UserLoginForm()
+    #     context = {
+    #         "form": form
+    #     }
+    #     return render(request, "ec_site/login.html", context)
     
     # def post(self, request, *args, **kwargs):
     #     form = UserLoginForm(request.POST)

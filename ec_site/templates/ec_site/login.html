@@ -9,10 +9,10 @@
         <div class="login_content">
 			<h1>ログインしてください。</h1><br>
 			<div class="form">
-            <form action="{% url 'ec_site:main'%}" method='POST'>
+            <form action="{% url 'ec_site:user_login' %}" method='POST'>
                 {% csrf_token %}
                 <table>
-                    {{form.as_table}}
+                    {{login_form.as_table}}
                 </table>
                 <input type="submit" value="ログイン">
 			</form>

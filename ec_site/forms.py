@@ -15,6 +15,7 @@ class UserLoginForm(forms.Form):
         value_pass = cleaned_data.get('password')
         if not AccountUser.objects.filter(user_id = value_id, password = value_pass).exists():
             raise forms.ValidationError("ユーザ名かパスワードが正しくありません。")
+        return cleaned_data
         
 class SearchFormCategory(forms.Form):
     category_name = forms.ModelChoiceField(
