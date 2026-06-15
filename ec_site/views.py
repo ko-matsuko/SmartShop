@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.views import generic
 from django.views.generic import View
 from ec_site.models import ShoppingCategory,ShoppingItem, AccountUser
-from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, CreateUserForm
+from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, CreateUserForm, UpdateUserForm
 
 
 class IndexView(View):
@@ -37,10 +37,6 @@ class SearchResult(View):
 
         category = ShoppingCategory.objects.get(name = category_name)
         queryset = ShoppingItem.objects.filter(category = category.category_id, name__icontains = keyword)
-        # queryset = ShoppingItem.objects.filter(category = category.category_id)
-
-
-        print(category.category_id, queryset, end="\n")
 
         context = {
             "category": category_name,
@@ -115,34 +111,70 @@ class UserLogout(View):
             return redirect('/')
         request.session.flush()
         return redirect('/')
-
-
-
-
-
-    # def get(self, request, *args, **kwargs):
-    #     form = UserLoginForm()
-    #     context = {
-    #         "form": form
-    #     }
-    #     return render(request, "ec_site/login.html", context)
     
-    # def post(self, request, *args, **kwargs):
-    #     form = UserLoginForm(request.POST)
+    
+class UserInfo(View):
+    def get(self, request, *args, **kwargs):
+        user_id = request.session["user_id"]
+        queryset = AccountUser.objects.get(user_id = user_id)
 
-    #     if not form.is_valid():
-    #         context = {
-    #             "form": form
-    #         }
-    #         return render(request, "ec_site/login.html", context)
+        context = {
+            "user":queryset
+        }
+        return render(request, "ec_site/userInfo.html",context)
+
+class UpdateUserInfo(View):
+    def get(self, request, *args, **kwargs):
+        form = UpdateUserForm()
+        context = {
+            "form": form,
+            "user_id":request.session["user_id"],
+        }
+        return render(request, "ec_site/updateUser.html",context)
+    
+    def post(self, request, *args, **kwargs):
+        form = UpdateUserForm(request.POST)
+
+        if not form.is_valid():
+            context = {
+                "form":form,
+                "user_id":request.session["user_id"],
+            }
+            return render(request, "ec_site/updateUser.html",context)
         
-    #     name = form.cleaned_data["name"]
-    #     flag = True
-    #     context = {
-    #         "name": name,
-    #         "flag": flag,
-    #     }
-    #     return render(request, "ec_site/main.html", context)
+        password = form.cleaned_data.get("password")
+        name = form.cleaned_data.get("name")
+        address = form.cleaned_data.get("address")
+
+        context = {
+            "user_id": request.session["user_id"],
+            "password": password,
+            "name": name,
+            "address": address,
+        }
+        return render(request, "ec_site/updateUserConfirm.html",context)
+
+class UpdateUserConfirm(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, "ec_site/updateUserConfirm.html")
+    
+    def post(self, request, *args, **kwargs):
+        # form = CreateUserForm(request.POST)
+        user = AccountUser()
+        user.user_id = request.session["user_id"]
+        user.password = request.POST["password"]
+        user.name = request.POST["name"]
+        user.address = request.POST["address"]
+        user.save()
+
+        context = {
+            "user_id": request.session["user_id"],
+            "name": user.name,
+            "address": user.address,
+        }
+        return render(request, "ec_site/updateUserCommit.html",context)
+
+
 
 class RegisterUser(View):
     def get(self, request, *args, **kwargs):
@@ -198,3 +230,25 @@ class CheckRegisterUser(View):
 class RegisterUserCommit(View):
     def get(self, request, *args, **kwargs):
         return render(request, "ec_site/check_registerUser.html")
+    
+class WithdrawConfirm(View):
+    def get(self, request, *args, **kwargs):
+        user = AccountUser.objects.get(user_id = request.session["user_id"])
+        name = user.name
+        
+        context = {
+            "name": name,
+        }
+        return render(request,"ec_site/withdrawConfirm.html",context)
+    
+    def post(self, request, *args, **kwargs):
+        user = AccountUser.objects.get(user_id = request.session["user_id"])
+        name = user.name
+        user.delete()
+        request.session.flush()
+
+        context = {
+            "name": name
+        }
+
+        return render(request, "ec_site/withdrawCommit.html",context)

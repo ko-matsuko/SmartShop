@@ -38,7 +38,7 @@ class SearchFormKeyword(forms.Form):
 class CreateUserForm(forms.Form):
     user_id = forms.CharField(label = "会員ID:", max_length=128)
     password = forms.CharField(label = "パスワード:", max_length=256)
-    password_check = forms.CharField(label = "パスワード:", max_length=256)
+    password_check = forms.CharField(label = "パスワード(確認用):", max_length=256)
     name = forms.CharField(label="お名前:", max_length=128)
     address = forms.CharField(label="ご住所:", max_length=256)
 
@@ -63,4 +63,24 @@ class CreateUserForm(forms.Form):
         
         return cleaned_data
     
+
+class UpdateUserForm(forms.Form):
+    password = forms.CharField(label = "パスワード:", max_length=256)
+    password_check = forms.CharField(label = "パスワード(確認用):", max_length=256)
+    name = forms.CharField(label="お名前:", max_length=128)
+    address = forms.CharField(label="ご住所:", max_length=256)
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        user_id = cleaned_data.get('user_id')
+        password1 = cleaned_data.get('password')
+        password2 = cleaned_data.get('password_check')
+
+        if AccountUser.objects.filter(user_id = user_id).exists():
+            raise forms.ValidationError("そのユーザIDは既に存在します")
+        
+        if password1 != password2:
+            raise forms.ValidationError("パスワードと確認用パスワードが一致しません")
+        
+        return cleaned_data
 
