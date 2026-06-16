@@ -34,8 +34,9 @@
         </div>
 
         <div class="item_purchase">
-            <form action="{% url 'ec_site:cart' item.item_id %}" method='POST'>
+            <form action="{% url 'ec_site:cart' %}" method='POST'>
             {% csrf_token %}
+            <input type="hidden" name="item_id" value="{{item.item_id}}">
             <tr>
                 <th>数量</th>
                 <td>

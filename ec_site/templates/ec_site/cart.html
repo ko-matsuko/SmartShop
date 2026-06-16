@@ -6,7 +6,7 @@
 		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
 	</head>
     <body>
-        <h1>ショッピングカート内の商品一覧</h1>
+        <h1>ショッピングカート内の商品一覧</h1><br>
 
         <table border="1">
             {% csrf_token %}
@@ -17,16 +17,18 @@
                 <th>単価</th>
                 <th>数量</th>
             </tr>
-            <tr>
-                <td>{{item.name}}</td>
-                <td>{{item.color}}</td>
-                <td>{{item.manufacturer}}</td>
-                <td>{{item.price}}</td>
-                <td>{{amount}}</td>
-            </tr>
+            {% for item in item_list %}
+                <tr>
+                    <td>{{item.name}}</td>
+                    <td>{{item.color}}</td>
+                    <td>{{item.manufacturer}}</td>
+                    <td>{{item.price}}</td>
+                    <td>{{item.amount}}</td>
+                </tr>
+            {% endfor %}
         </table>
 
-        <h3>合計{{charge}}円</h3><br>
+        <h3>合計{{charge_total}}円</h3><br>
 
         <a href="/ec_site/">商品検索</a>へ<br><br>
     </body>
