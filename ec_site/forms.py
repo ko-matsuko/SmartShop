@@ -7,7 +7,7 @@ class UserLoginForm(forms.Form):
         self.label_suffix = ""
 
     user_id = forms.CharField(label = "会員ID", max_length=128)
-    password = forms.CharField(label = "ユーザパスワード", max_length=256)
+    password = forms.CharField(label="パスワード", max_length=256, widget=forms.PasswordInput(render_value=True))
 
     def clean(self):
         cleaned_data = super().clean()
@@ -37,8 +37,8 @@ class SearchFormKeyword(forms.Form):
     
 class CreateUserForm(forms.Form):
     user_id = forms.CharField(label = "会員ID:", max_length=128)
-    password = forms.CharField(label = "パスワード:", max_length=256)
-    password_check = forms.CharField(label = "パスワード(確認用):", max_length=256)
+    password = forms.CharField(label="パスワード:", max_length=256, widget=forms.PasswordInput(render_value=True))
+    password_check = forms.CharField(label="パスワード(確認用):", max_length=256, widget=forms.PasswordInput(render_value=True))
     name = forms.CharField(label="お名前:", max_length=128)
     address = forms.CharField(label="ご住所:", max_length=256)
 
@@ -65,8 +65,8 @@ class CreateUserForm(forms.Form):
     
 
 class UpdateUserForm(forms.Form):
-    password = forms.CharField(label = "パスワード:", max_length=256)
-    password_check = forms.CharField(label = "パスワード(確認用):", max_length=256)
+    password = forms.CharField(label="パスワード:", max_length=256, widget=forms.PasswordInput(render_value=True))
+    password_check = forms.CharField(label="パスワード(確認用):", max_length=256, widget=forms.PasswordInput(render_value=True))
     name = forms.CharField(label="お名前:", max_length=128)
     address = forms.CharField(label="ご住所:", max_length=256)
     

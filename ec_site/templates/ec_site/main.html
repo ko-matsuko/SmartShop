@@ -11,15 +11,24 @@
             <form action="{% url 'ec_site:search_result'%}" method='POST'>
             {% csrf_token %}
             <tr>
-                <th>{{form_category}}</th>
-                <th>{{form_keyword}}</th>
+                <td>カテゴリ:</td>
+                <td>
+                    <select name="category" id="id_category">
+                        <option value="0" selected>すべて</option>
+                        {% for category in category_list %}
+                            <option value="{{category.category_id}}">{{category.name}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>キーワード:</td>
+                <td><input type="text" name="keyword" class="text"></td>
             </tr>
             <input type='submit' value='検索' />
             </form>
         </div>
         <br>
         <div class="links">
-            <a href="/ec_site/checkCart/">ショッピングカートを見る</a>
+            <a href="/ec_site/cart/">ショッピングカートを見る</a>
         </div>
         <br><br>
         <div class="nonlogin_only">
