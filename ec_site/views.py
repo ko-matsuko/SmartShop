@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 from django.views import generic
 from django.views.generic import View
-from ec_site.models import ShoppingCategory,ShoppingItem, AccountUser
+from ec_site.models import ShoppingCategory,ShoppingItem, ShoppingItemsIncart, AccountUser
 from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, CreateUserForm, UpdateUserForm
 
 
@@ -59,25 +59,86 @@ class ItemDetail(View):
             "num_list": stock_num_list,
         }
         return render(request, "ec_site/item_detail.html", context)
-
-class Cart(View):
-    def get(self, request):
-        return render(request, "ec_site/cart.html")
     
-    def post(self, request, pk):
+class Cart(View):
+    def get(self, request, *args, **kwargs):
         if not request.session.get('is_login', None):
             return redirect('/ec_site/userLogin')
         else:
-            queryset = ShoppingItem.objects.get(pk=pk)
-            item_amount = request.POST["amount"]
-            charge = int(queryset.price)*int(item_amount)
+            item_incart = ShoppingItemsIncart.objects.filter(user_id = request.session["user_id"])
 
+            print('item_incart:')
+            print(item_incart)
+
+            item_list = []
+            charge_total = 0
+            for item in item_incart:
+                item_detail = ShoppingItem.objects.get(item_id = item.item_id)
+                print('item_detail:')
+                print(item_detail)
+
+                item_dict = {
+                    "name":item_detail.name,
+                    "color": item_detail.color,
+                    "manufacturer":item_detail.manufacturer,
+                    "price": item_detail.price,
+                    "amount": item.amount
+                }
+                item_list.append(item_dict)
+                charge_total += item.amount * item_detail.price
+
+            print('charge_total:')
+            print(charge_total)
             context = {
-                "item": queryset,
-                "amount": item_amount,
-                "charge": charge,
+                "item_list":item_list,
+                "charge_total":charge_total
             }
-            return render(request, "ec_site/cart.html", context)
+            return render(request, "ec_site/cart.html",context)
+    
+    def post(self, request,  *args, **kwargs):
+        if not request.session.get('is_login', None):
+            return redirect('/ec_site/userLogin')
+        else:
+            item_id = request.POST["item_id"]
+            new_item = ShoppingItem.objects.get(item_id = item_id)
+            item_amount = request.POST["amount"]
+
+            cart_item = ShoppingItemsIncart()
+            cart_item.amount = item_amount
+            cart_item.item_id = new_item.item_id
+            cart_item.user_id = request.session["user_id"]
+            cart_item.save()
+
+            item_incart = ShoppingItemsIncart.objects.filter(user_id = request.session["user_id"])
+
+            print('item_incart:')
+            print(item_incart)
+
+            item_list = []
+            charge_total = 0
+            for item in item_incart:
+                item_detail = ShoppingItem.objects.get(item_id = item.item_id)
+                print('item_detail:')
+                print(item_detail)
+
+                item_dict = {
+                    "name":item_detail.name,
+                    "color": item_detail.color,
+                    "manufacturer":item_detail.manufacturer,
+                    "price": item_detail.price,
+                    "amount": item.amount
+                }
+                item_list.append(item_dict)
+                charge_total += item.amount * item_detail.price
+
+            print('charge_total:')
+            print(charge_total)
+            context = {
+                "item_list":item_list,
+                "charge_total":charge_total
+            }
+            return render(request, "ec_site/cart.html",context)
+    
 
 class UserLogin(View):
     def get(self, request, *args, **kwargs):
