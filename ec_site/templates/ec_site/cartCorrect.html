@@ -1,0 +1,46 @@
+{% load static %}
+<html>
+	<head>
+		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+		<title>ショッピングカート修正</title>
+		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
+	</head>
+	<body>
+        <h1>ショッピングカート内の商品修正</h1>
+
+        <div class="amount_correct">
+            <form action="{% url 'ec_site:cart' %}" method='POST'>
+                <input type="hidden" name="item_id" value="{{item_id}}">
+
+                <table border="1">
+                    {% csrf_token %}
+                    <tr>
+                        <th>商品名</th>
+                        <th>商品の色</th>
+                        <th>メーカー名</th>
+                        <th>単価</th>
+                        <th>数量</th>
+                    </tr>
+                    <tr>
+                        <td>{{name}}</td>
+                        <td>{{color}}</td>
+                        <td>{{manufacturer}}</td>
+                        <td>{{price}}</td>
+                        <td>
+                            <select name = "amount" id = "amount">
+                                {% for i in num_list %}
+                                    {% if i == amount %}
+                                        <option value="{{i}}" selected>{{i}}</option>
+                                    {% else %}
+                                        <option value="{{i}}">{{i}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <input type="submit" value="修正"/>
+            </form>
+        </div>
+        <a href="/ec_site/">商品検索</a>へ<br><br>
+    </body>

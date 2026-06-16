@@ -1,0 +1,37 @@
+{% load static %}
+<html>
+	<head>
+		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+		<title>会員情報の確認</title>
+		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
+	</head>
+    <body>
+        <h1>会員情報</h1>
+
+        <div class="user_info">
+            <table border="1">
+                {% csrf_token %}
+                <tr>
+                    <th>会員ID</th>
+                    <td>{{user.user_id}}</td>
+                </tr>
+                <tr>
+                    <th>パスワード</th>
+                    <td>表示なし</td>
+                </tr>
+                <tr>
+                    <th>お名前</th>
+                    <td>{{user.name}}</td>
+                </tr>
+                <tr>
+                    <th>ご住所</th>
+                    <td>{{user.address}}</td>
+                </tr>
+            </table>
+        </div>
+        <br>
+        <div class="links">
+            <a href="/ec_site/updateUserInfo/">会員情報の変更</a><br>
+            <a href="/ec_site/">商品検索</a>へ<br><br>
+        </div>
+    </body>

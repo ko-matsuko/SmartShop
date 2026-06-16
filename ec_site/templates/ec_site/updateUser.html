@@ -1,0 +1,33 @@
+{% load static %}
+<html>
+	<head>
+		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+		<title>会員情報</title>
+		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
+	</head>
+    <body>
+        <h1>会員情報</h1>
+
+		<div class="input_newinfo">
+			<form action="{% url 'ec_site:update_user' %}" method="POST">
+                {% csrf_token %}
+                <table border="1">
+					<tr>
+						<th>会員ID:</th>
+						<td>{{user_id}}</td>
+					</tr>
+                    {% for field in form %}
+                    <tr>
+                        <th>{{field.label}}</th>
+                        <td>{{field}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <input type="submit" value="変更">
+            </form>
+		</div>
+        <div class="links">
+            <a href="/ec_site/withdrawConfirm/">退会する</a><br>
+            <a href="/ec_site/">商品検索</a>へ<br>
+        </div>
+    </body>
