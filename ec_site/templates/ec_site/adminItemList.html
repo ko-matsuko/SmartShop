@@ -1,0 +1,79 @@
+{% load static %}
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>管理者商品一覧</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'ec_site/css/style.css' %}" />
+</head>
+<body>
+    <h1>商品リスト</h1>
+
+    <form method="GET" action="{% url 'ec_site:admin_item_list' %}">
+        <label>カテゴリ:</label>
+        <select name="category">
+            <option value="0" {% if selected_category == "0" %}selected{% endif %}>すべて</option>
+            {% for category in category_list %}
+                <option value="{{ category.category_id }}" {% if selected_category == category.category_id|stringformat:"s" %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label>キーワード:</label>
+        <input type="text" name="keyword" value="{{ keyword }}">
+        <input type="submit" value="検索">
+    </form>
+
+    <br>
+
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>商品名</th>
+            <th>色</th>
+            <th>メーカー</th>
+            <th>価格</th>
+            <th>在庫</th>
+            <th>おすすめ</th>
+            <th>修正</th>
+            <th>削除</th>
+        </tr>
+
+        {% for item in item_list %}
+        <tr>
+            <td>{{ item.item_id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.color }}</td>
+            <td>{{ item.manufacturer }}</td>
+            <td>{{ item.price }}</td>
+            <td>{{ item.stock }}</td>
+            <td>
+                <form method="POST" action="{% url 'ec_site:admin_recommend_update' item.item_id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="keyword" value="{{ keyword }}">
+                    <input type="hidden" name="category" value="{{ selected_category }}">
+                    <input type="checkbox" name="recommended"
+                           {% if item.recommended %}checked{% endif %}
+                           onchange="this.form.submit()">
+                </form>
+            </td>
+            <td>
+                <a href="{% url 'ec_site:admin_item_update' item.item_id %}">修正</a>
+            </td>
+            <td>
+                <form method="POST" action="{% url 'ec_site:admin_item_delete' item.item_id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="keyword" value="{{ keyword }}">
+                    <input type="hidden" name="category" value="{{ selected_category }}">
+                    <input type="submit" value="削除" onclick="return confirm('削除しますか？');">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <a href="/ec_site/adminItemCreate/">商品登録</a><br><br>
+    <a href="/ec_site/adminMain/">管理者メインへ戻る</a>
+</body>
+</html>
