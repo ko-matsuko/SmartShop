@@ -105,7 +105,7 @@ class Cart(View):
             item_amount = request.POST["amount"]
 
             if ShoppingItemsIncart.objects.filter(item_id = item_id, user_id = request.session["user_id"]).exists():
-                cart_item = ShoppingItemsIncart.objects.get(item_id = item_id)
+                cart_item = ShoppingItemsIncart.objects.get(item_id = item_id, user_id = request.session["user_id"])
             else:
                 cart_item = ShoppingItemsIncart()
             cart_item.amount = item_amount
@@ -121,6 +121,7 @@ class Cart(View):
                 item_detail = ShoppingItem.objects.get(item_id = item.item_id)
 
                 item_dict = {
+                    "item_id": item.item_id,
                     "name":item_detail.name,
                     "color": item_detail.color,
                     "manufacturer":item_detail.manufacturer,
@@ -138,7 +139,7 @@ class Cart(View):
     
 class CartCorrect(View):
     def get(self, request, pk):
-        cart_item = ShoppingItemsIncart.objects.get(item_id=pk)
+        cart_item = ShoppingItemsIncart.objects.get(item_id=pk, user_id=request.session["user_id"])
         item_detail = ShoppingItem.objects.get(item_id = cart_item.item_id)
 
         stock_num_list = []
