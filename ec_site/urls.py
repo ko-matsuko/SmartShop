@@ -21,12 +21,11 @@ urlpatterns = [
     path("withdrawConfirm/", views.WithdrawConfirm.as_view(), name = "withdraw_confirm"),
     path("adminLogin/", views.AdminLogin.as_view(), name="admin_login"),
     path("adminMain/", views.AdminMain.as_view(), name="admin_main"),
-    
     path("adminLogout/", views.AdminLogout.as_view(), name="admin_logout"),
     path("adminItemList/", views.AdminItemList.as_view(), name="admin_item_list"),
     path("adminItemCreate/", views.AdminItemCreate.as_view(), name="admin_item_create"),
     path("adminItemUpdate/<int:pk>/", views.AdminItemUpdate.as_view(), name="admin_item_update"),
     path("adminItemDelete/<int:pk>/", views.AdminItemDelete.as_view(), name="admin_item_delete"),
     path("adminRecommendUpdate/<int:pk>/", views.AdminRecommendUpdate.as_view(), name="admin_recommend_update"),
-
+    path("adminPurchaseLog/", views.AdminPurchaseLog.as_view(), name="admin_PurchaseLog"),
 ]

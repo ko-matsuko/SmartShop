@@ -6,6 +6,9 @@ from django.urls import reverse
 from ec_site.models import ShoppingCategory,ShoppingItem, ShoppingItemsIncart, AccountUser, ShoppingPurchase, ShoppingPurchaseDetail
 from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, CreateUserForm, UpdateUserForm, AdminLoginForm, AdminItemForm
 from django.db.models import Prefetch
+from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, CreateUserForm, UpdateUserForm, AdminLoginForm
+from django.db.models import Q, Prefetch
+
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
@@ -221,7 +224,7 @@ class UserInfo(View):
         user_id = request.session["user_id"]
         queryset = AccountUser.objects.get(user_id = user_id)
         
-        purchase_list = ShoppingPurchase.objects.filter(user__user_id=user_id).order_by("-booked_date").prefetch_related(Prefetch("shoppingpurchasedetail_set",queryset=ShoppingPurchaseDetail.objects.select_related("item")))
+        purchase_list = ShoppingPurchase.objects.filter(user__user_id=user_id, cancel=False).order_by("-booked_date").prefetch_related(Prefetch("shoppingpurchasedetail_set",queryset=ShoppingPurchaseDetail.objects.select_related("item")))
 
 
         context = {
@@ -394,6 +397,7 @@ class AdminMain(View):
 
         return render(request, "ec_site/adminMain.html")
 
+
 class AdminItemList(View):
     def get(self, request, *args, **kwargs):
         if not request.session.get("is_admin_login"):
@@ -532,3 +536,43 @@ class AdminLogout(View):
     def get(self, request, *args, **kwargs):
         request.session.flush()
         return redirect("/ec_site/adminLogin/")
+
+class AdminPurchaseLog(View):
+    def get(self, request, *args, **kwargs):
+        user_id = request.session["user_id"]
+        purchase_list = ShoppingPurchase.objects.filter(cancel=False).order_by("-booked_date").prefetch_related(Prefetch("shoppingpurchasedetail_set",queryset=ShoppingPurchaseDetail.objects.select_related("item")))
+        user_list = AccountUser.objects.all()
+        item_list = ShoppingItem.objects.all()
+        context = {
+            "purchase_list": purchase_list,
+            "user_list": user_list,
+            "item_list": item_list,
+        }
+        return render(request, "ec_site/adminPurchaseLog.html",context)
+
+    def post(self, request, *args, **kwargs):
+        
+        keyword = request.POST.get("keyword", "").strip()
+        purchase_list = ShoppingPurchase.objects.order_by("-booked_date").prefetch_related(
+            Prefetch(
+                "shoppingpurchasedetail_set",
+                queryset=ShoppingPurchaseDetail.objects.select_related("item")
+            )
+        )
+
+        if keyword:
+           purchase_list = purchase_list.filter(
+                Q(purchase_id__icontains=keyword) |
+                Q(destination__icontains=keyword) |
+                Q(user__name__icontains=keyword) |
+                Q(shoppingpurchasedetail__item__name__icontains=keyword) |
+                Q(shoppingpurchasedetail__item__manufacturer__icontains=keyword) |
+                Q(shoppingpurchasedetail__item__color__icontains=keyword)
+            ).distinct()
+           
+        context = {
+            "keyword": keyword,
+            "purchase_list": purchase_list,
+        }
+        return render(request, "ec_site/adminPurchaseLog.html", context)
+

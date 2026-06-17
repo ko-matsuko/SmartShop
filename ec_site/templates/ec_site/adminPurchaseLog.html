@@ -1,0 +1,77 @@
+{% load static %}
+<html>
+	<head>
+		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+		<title>購入履歴</title>
+		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
+	</head>
+    <body>
+        <h1>購入履歴</h1>
+
+		<div class="content">
+			{% csrf_token %}
+            <form action="{% url 'ec_site:admin_PurchaseLog'%}" method='POST'>
+            {% csrf_token %}
+            <tr>
+                <!--
+                <td>注文者:</td>
+                <td>
+                    <select name="user" id="id_user">
+                        <option value="0" selected>すべて</option>
+                        {% for user in user_list %}
+                            <option value="{{user.id_user}}">{{user.name}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>商品名:</td>
+                <td>
+                    <select name="item" id="id_item">
+                        <option value="0" selected>すべて</option>
+                        {% for item in item_list %}
+                            <option value="{{item.id_item}}">{{item.name}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                -->
+            </td>
+
+                <td>キーワード:</td>
+                <td><input type="text" name="keyword" class="text"></td>
+            </tr>
+            <input type='submit' value='検索' />
+            </form>
+			<div class="purchase_list">
+				<table border="1">
+                    <tr>
+                        <th>注文日</th>
+                        <th>注文者</th>
+                        <th>商品名</th>
+                        <th>商品の色</th>
+                        <th>メーカー名</th>
+                        <th>注文数</th>
+                        <th>価格</th>
+                    </tr>
+                    {% for purchase in purchase_list %}          
+                        {% for detail in purchase.shoppingpurchasedetail_set.all %}
+                        <tr>
+                            <td>{{ purchase.booked_date }}</td>
+                            <td>{{ purchase.user_id}}</td>
+                            <td>{{ detail.item.name }}</td>
+                            <td>{{ detail.item.color }}</td>
+                            <td>{{ detail.item.manufacturer }}</td>
+                            <td>{{ detail.amount }}</td>
+                            <td>{{ detail.item.price }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% endfor %}
+                </table>
+			</div>
+
+			<br>
+			<div class="link">
+				<a href="/ec_site/adminMain/">管理者メインページ</a>へ<br><br>
+			</div>
+			
+		</div>
+    </body>
+</html>
