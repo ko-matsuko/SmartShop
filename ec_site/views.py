@@ -4,8 +4,11 @@ from django.views import generic
 from django.views.generic import View
 from django.urls import reverse
 from ec_site.models import ShoppingCategory,ShoppingItem, ShoppingItemsIncart, AccountUser, ShoppingPurchase, ShoppingPurchaseDetail
+from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, CreateUserForm, UpdateUserForm, AdminLoginForm, AdminItemForm
+from django.db.models import Prefetch
 from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, CreateUserForm, UpdateUserForm, AdminLoginForm
 from django.db.models import Q, Prefetch
+
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
@@ -386,7 +389,6 @@ class AdminLogin(View):
         else:
             return render(request, "ec_site/adminLogin.html", {"login_form": login_form})
 
-
 class AdminMain(View):
     def get(self, request, *args, **kwargs):
         
@@ -394,6 +396,146 @@ class AdminMain(View):
             return redirect("/ec_site/adminLogin/")
 
         return render(request, "ec_site/adminMain.html")
+
+
+class AdminItemList(View):
+    def get(self, request, *args, **kwargs):
+        if not request.session.get("is_admin_login"):
+            return redirect("/ec_site/adminLogin/")
+
+        category_list = ShoppingCategory.objects.all()
+        queryset = ShoppingItem.objects.all().order_by("item_id")
+
+        keyword = request.GET.get("keyword", "")
+        category_id = request.GET.get("category", "0")
+
+        if keyword:
+            queryset = queryset.filter(name__icontains=keyword)
+
+        if category_id != "0":
+            queryset = queryset.filter(category_id=category_id)
+
+        context = {
+            "category_list": category_list,
+            "item_list": queryset,
+            "keyword": keyword,
+            "selected_category": category_id,
+        }
+        return render(request, "ec_site/adminItemList.html", context)
+    
+class AdminRecommendUpdate(View):
+    def post(self, request, pk, *args, **kwargs):
+        if not request.session.get("is_admin_login"):
+            return redirect("/ec_site/adminLogin/")
+
+        item = ShoppingItem.objects.get(pk=pk)
+
+        # チェックON時だけ "on" が来る
+        item.recommended = "recommended" in request.POST
+        item.save()
+
+        keyword = request.POST.get("keyword", "")
+        category = request.POST.get("category", "0")
+        return redirect(f"/ec_site/adminItemList/?keyword={keyword}&category={category}")
+
+class AdminItemDelete(View):
+    def post(self, request, pk, *args, **kwargs):
+        if not request.session.get("is_admin_login"):
+            return redirect("/ec_site/adminLogin/")
+
+        item = ShoppingItem.objects.get(pk=pk)
+        item.delete()
+
+        keyword = request.POST.get("keyword", "")
+        category = request.POST.get("category", "0")
+        return redirect(f"/ec_site/adminItemList/?keyword={keyword}&category={category}")
+
+class AdminItemCreate(View):
+    def get(self, request, *args, **kwargs):
+        if not request.session.get("is_admin_login"):
+            return redirect("/ec_site/adminLogin/")
+
+        form = AdminItemForm()
+        return render(request, "ec_site/adminItemCreate.html", {"form": form})
+
+    def post(self, request, *args, **kwargs):
+        if not request.session.get("is_admin_login"):
+            return redirect("/ec_site/adminLogin/")
+
+        form = AdminItemForm(request.POST)
+        if not form.is_valid():
+            return render(request, "ec_site/adminItemCreate.html", {"form": form})
+
+        item = ShoppingItem()
+        item.category_id = form.cleaned_data["category"].category_id
+        item.name = form.cleaned_data["name"]
+        item.manufacturer = form.cleaned_data["manufacturer"]
+        item.color = form.cleaned_data["color"]
+        item.price = form.cleaned_data["price"]
+        item.stock = form.cleaned_data["stock"]
+        item.recommended = form.cleaned_data["recommended"]
+        
+        last_item = ShoppingItem.objects.order_by('-item_id').first()
+        if last_item:
+            item.item_id = last_item.item_id + 1
+        else:
+            item.item_id = 1
+
+        item.save()
+
+        return redirect("/ec_site/adminItemList/")
+
+class AdminItemUpdate(View):
+    def get(self, request, pk, *args, **kwargs):
+        if not request.session.get("is_admin_login"):
+            return redirect("/ec_site/adminLogin/")
+
+        item = ShoppingItem.objects.get(pk=pk)
+        initial_data = {
+            "category": item.category_id,
+            "name": item.name,
+            "manufacturer": item.manufacturer,
+            "color": item.color,
+            "price": item.price,
+            "stock": item.stock,
+            "recommended": item.recommended,
+        }
+        form = AdminItemForm(initial=initial_data)
+        context = {
+            "form": form,
+            "item_id": item.item_id,
+        }
+        return render(request, "ec_site/adminItemUpdate.html", context)
+
+    def post(self, request, pk, *args, **kwargs):
+        if not request.session.get("is_admin_login"):
+            return redirect("/ec_site/adminLogin/")
+
+        item = ShoppingItem.objects.get(pk=pk)
+        form = AdminItemForm(request.POST)
+
+        if not form.is_valid():
+            return render(request, "ec_site/adminItemUpdate.html", {
+                "form": form,
+                "item_id": item.item_id,
+            })
+
+        item.category_id = form.cleaned_data["category"].category_id
+        item.name = form.cleaned_data["name"]
+        item.manufacturer = form.cleaned_data["manufacturer"]
+        item.color = form.cleaned_data["color"]
+        item.price = form.cleaned_data["price"]
+        item.stock = form.cleaned_data["stock"]
+        item.recommended = form.cleaned_data["recommended"]
+        item.save()
+
+        return redirect("/ec_site/adminItemList/")
+
+
+class AdminLogout(View):
+    def get(self, request, *args, **kwargs):
+        request.session.flush()
+        return redirect("/ec_site/adminLogin/")
 
 class AdminPurchaseLog(View):
     def get(self, request, *args, **kwargs):
@@ -433,3 +575,4 @@ class AdminPurchaseLog(View):
             "purchase_list": purchase_list,
         }
         return render(request, "ec_site/adminPurchaseLog.html", context)
+
