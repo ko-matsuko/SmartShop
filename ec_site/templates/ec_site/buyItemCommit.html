@@ -1,0 +1,32 @@
+{% load static %}
+<html>
+	<head>
+		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+		<title>購入確定</title>
+		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
+	</head>
+
+    <body>
+
+        <h1>購入が完了しました</h1>
+    
+        <p>ご注文ありがとうございます。</p>
+    
+        <hr>
+    
+        <h2>注文情報</h2>
+    
+        <p>注文番号：{{ purchase.purchase_id }}</p>
+        <p>注文日時：{{ purchase.booked_date }}</p>
+        <p>配送先：{{ purchase.destination }}</p>
+    
+        <hr>
+    
+        <a href="/ec_site/">商品検索</a>へ<br>
+    
+    </body>
+    
+</html>
+
+
+

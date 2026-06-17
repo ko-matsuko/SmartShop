@@ -1,0 +1,60 @@
+{% load static %}
+<html>
+	<head>
+		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+		<title>購入内容確認</title>
+		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
+	</head>
+    <body>
+        <h2>購入内容確認</h2>
+    
+        <form method="post" action="{% url 'ec_site:buy_item_commit' %}">
+            {% csrf_token %}
+    
+            <!-- 購入アイテム一覧 -->
+            <h3>購入アイテム</h3>
+            <table border="1">
+                <tr>
+                    <th>商品名</th>
+                    <th>個数</th>
+                    <th>小計</th>
+                </tr>
+            
+                {% for item in cart %}
+                <tr>
+                    <td>{{ item.item.name }}</td>
+                    <td>{{ item.amount }}</td>
+                    <td>{{ item.subtotal }}円</td>
+                </tr>
+                {% endfor %}
+            </table>
+            
+            <p>合計金額：{{ total }}円</p>
+    
+            <p id="total"></p>
+    
+            <!-- ユーザー情報 -->
+            <h3>お届け先情報</h3>
+            <p>お名前：{{ cart.0.user.name }}</p>
+            <p>住所：<input type="text" name="address" value="{{ cart.0.user.address }}" size="50"></p>
+            <p>支払方法：<select name="payment_method"><option value="cod">代金引換</option></select></p>
+
+    
+            <!-- 購入ボタン -->
+        {% if cart %}
+            <button type="submit">購入する</button>
+        {% else %}
+            <button type="submit" disabled>購入する（カートが空です）</button>
+        {% endif %}        
+        </form>
+        <div class="links">
+            <a href="/ec_site/">商品検索</a>へ<br>
+        </div>
+    </body>
+</html>
+
+
+
+
+
+

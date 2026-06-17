@@ -6,6 +6,7 @@ from django.urls import reverse
 from ec_site.models import ShoppingCategory,ShoppingItem, ShoppingItemsIncart, AccountUser, ShoppingPurchase, ShoppingPurchaseDetail
 from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, CreateUserForm, UpdateUserForm, AdminLoginForm, AdminItemForm
 from django.db.models import Prefetch
+from datetime import datetime
 from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, CreateUserForm, UpdateUserForm, AdminLoginForm
 from django.db.models import Q, Prefetch
 
@@ -370,6 +371,7 @@ class WithdrawConfirm(View):
 
         return render(request, "ec_site/withdrawCommit.html",context)
 
+
 # 管理者ログイン機能
 class AdminLogin(View):
     def get(self, request, *args, **kwargs):
@@ -396,6 +398,76 @@ class AdminMain(View):
             return redirect("/ec_site/adminLogin/")
 
         return render(request, "ec_site/adminMain.html")
+    
+
+class BuyItem(View):
+    def get(self, request, *args, **kwargs):
+        user_id = request.session.get("user_id")
+        cart = ShoppingItemsIncart.objects.filter(user_id=user_id)
+
+        total = 0
+        for c in cart:
+            c.subtotal = c.item.price * c.amount  # 小計を追加
+            total += c.subtotal
+
+        context = {
+            "cart": cart,
+            "total": total,
+        }
+
+        return render(request, "ec_site/buyItem.html", context)
+
+    def post(self, request, *args, **kwargs):
+        # セッションからログインユーザーID取得
+        user_id = request.session.get("user_id")
+        cart = ShoppingItemsIncart.objects.filter(user_id=user_id)
+
+        total = 0
+        for c in cart:
+            c.subtotal = c.item.price * c.amount  # 小計を追加
+            total += c.subtotal
+
+        context = {
+            "cart": cart,
+            "total": total,
+        }
+
+        return render(request, "ec_site/buyItem.html", context)
+    
+
+
+class BuyItemCommit(View):
+    def post(self, request, *args, **kwargs):
+        new_purchase = ShoppingPurchase()
+        user_id=request.session.get("user_id")
+        user= AccountUser.objects.get(user_id = user_id)
+        
+
+        today_str = datetime.now().strftime("%Y%m%d")
+        count_today = ShoppingPurchase.objects.filter(purchase_id__startswith=today_str).count()
+        sequence = str(count_today + 1).zfill(2)
+        purchase_id_str = f"{today_str}{sequence}"
+        new_purchase.purchase_id = int(purchase_id_str)
+        new_purchase.user = user
+        new_purchase.destination = request.POST["address"]
+        new_purchase.save()
+        
+        cart_items = ShoppingItemsIncart.objects.filter(user=user)
+        for cart_item in cart_items:
+            item = cart_item.item
+            item.stock -= cart_item.amount
+
+            if item.stock < 0:
+                item.stock = 0
+
+            item.save()
+
+        ShoppingItemsIncart.objects.filter(user=user).delete()
+
+        context={
+            "purchase":new_purchase,
+        }
+        return render(request, "ec_site/buyItemCommit.html", context)
 
 
 class AdminItemList(View):
@@ -575,4 +647,3 @@ class AdminPurchaseLog(View):
             "purchase_list": purchase_list,
         }
         return render(request, "ec_site/adminPurchaseLog.html", context)
-
