@@ -110,5 +110,16 @@ class AdminLoginForm(forms.Form):
                 raise forms.ValidationError("管理者IDまたはパスワードが正しくありません。")
 
         return cleaned_data
-
-
+    
+class AdminItemForm(forms.Form):
+    category = forms.ModelChoiceField(
+        queryset=ShoppingCategory.objects.all(),
+        label="カテゴリ"
+    )
+    name = forms.CharField(label="商品名")
+    manufacturer = forms.CharField(label="メーカー")
+    color = forms.CharField(label="色")
+    price = forms.IntegerField(label="価格")
+    stock = forms.IntegerField(label="在庫")
+    recommended = forms.BooleanField(required=False, label="おすすめ")
+    

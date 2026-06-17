@@ -1,0 +1,20 @@
+{% load static %}
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>商品登録</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'ec_site/css/style.css' %}" />
+</head>
+<body>
+    <h1>商品登録</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <table border="1">
+            {{ form.as_table }}
+        </table>
+        <input type="submit" value="登録">
+    </form>
+    <br>
+    <a href="/ec_site/adminItemList/">商品一覧へ戻る</a>
+</body>
+</html>
