@@ -1,5 +1,5 @@
 from django import forms
-from ec_site.models import AccountUser, ShoppingCategory
+from ec_site.models import AccountUser, ShoppingCategory, AdministratorAdmin
 
 class UserLoginForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -83,4 +83,32 @@ class UpdateUserForm(forms.Form):
             raise forms.ValidationError("パスワードと確認用パスワードが一致しません")
         
         return cleaned_data
+    
+# 管理者ログイン
+class AdminLoginForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_suffix = ""
+
+    admin_id = forms.CharField(label="管理者ID", max_length=128)
+    password = forms.CharField(
+        label="パスワード",
+        max_length=256,
+        widget=forms.PasswordInput(render_value=True)
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        admin_id = cleaned_data.get("admin_id")
+        password = cleaned_data.get("password")
+
+        if admin_id and password:
+            if not AdministratorAdmin.objects.filter(
+                admin_id=admin_id,
+                password=password
+            ).exists():
+                raise forms.ValidationError("管理者IDまたはパスワードが正しくありません。")
+
+        return cleaned_data
+
 
