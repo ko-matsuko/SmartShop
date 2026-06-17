@@ -3,10 +3,9 @@ from django.shortcuts import redirect
 from django.views import generic
 from django.views.generic import View
 from django.urls import reverse
-from ec_site.models import ShoppingCategory,ShoppingItem, ShoppingItemsIncart, AccountUser
+from ec_site.models import ShoppingCategory,ShoppingItem, ShoppingItemsIncart, AccountUser, ShoppingPurchase, ShoppingPurchaseDetail
 from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, CreateUserForm, UpdateUserForm, AdminLoginForm
-
-
+from django.db.models import Prefetch
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
@@ -221,9 +220,13 @@ class UserInfo(View):
     def get(self, request, *args, **kwargs):
         user_id = request.session["user_id"]
         queryset = AccountUser.objects.get(user_id = user_id)
+        
+        purchase_list = ShoppingPurchase.objects.filter(user__user_id=user_id).order_by("-booked_date").prefetch_related(Prefetch("shoppingpurchasedetail_set",queryset=ShoppingPurchaseDetail.objects.select_related("item")))
+
 
         context = {
-            "user":queryset
+            "purchase_list": purchase_list,
+            "user":queryset,
         }
         return render(request, "ec_site/userInfo.html",context)
 
