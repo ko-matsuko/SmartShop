@@ -3,7 +3,8 @@ from django.shortcuts import redirect
 from django.views import generic
 from django.views.generic import View
 from ec_site.models import ShoppingCategory,ShoppingItem, ShoppingItemsIncart, AccountUser
-from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, CreateUserForm, UpdateUserForm
+from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, CreateUserForm, UpdateUserForm, AdminLoginForm
+
 
 
 class IndexView(View):
@@ -341,3 +342,31 @@ class WithdrawConfirm(View):
         }
 
         return render(request, "ec_site/withdrawCommit.html",context)
+
+# 管理者ログイン機能
+class AdminLogin(View):
+    def get(self, request, *args, **kwargs):
+        login_form = AdminLoginForm()
+        return render(request, "ec_site/adminLogin.html", {"login_form": login_form})
+
+    def post(self, request, *args, **kwargs):
+        login_form = AdminLoginForm(request.POST)
+        if login_form.is_valid():
+            admin_id = login_form.cleaned_data.get("admin_id")
+
+            # セッション管理
+            request.session["is_admin_login"] = True
+            request.session["admin_id"] = admin_id
+
+            return redirect("/ec_site/adminMain/")
+        else:
+            return render(request, "ec_site/adminLogin.html", {"login_form": login_form})
+
+
+class AdminMain(View):
+    def get(self, request, *args, **kwargs):
+        
+        if not request.session.get("is_admin_login"):
+            return redirect("/ec_site/adminLogin/")
+
+        return render(request, "ec_site/adminMain.html")

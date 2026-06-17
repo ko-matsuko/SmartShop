@@ -1,0 +1,22 @@
+{% load static %}
+<html>
+    <head>
+        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+        <title>管理者ログイン画面</title>
+        <link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
+    </head>
+    <body>
+        <div class="login_content">
+            <h1>管理者ログイン</h1><br>
+            <div class="form">
+                <form action="{% url 'ec_site:admin_login' %}" method='POST'>
+                    {% csrf_token %}
+                    <table>
+                        {{login_form.as_table}}
+                    </table>
+                    <input type="submit" value="ログイン">
+                </form>
+            </div>
+        </div>
+    </body>
+</html>
