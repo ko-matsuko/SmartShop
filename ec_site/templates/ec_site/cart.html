@@ -31,6 +31,11 @@
         </table>
 
         <h3>合計{{charge_total}}円</h3><br>
+        <form action="{% url 'ec_site:buy_item' %}" method="POST">
+            {% csrf_token %}
+            <input type="submit" value="購入">
+        </form>
 
         <a href="/ec_site/">商品検索</a>へ<br><br>
     </body>
+

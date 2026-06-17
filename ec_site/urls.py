@@ -21,5 +21,6 @@ urlpatterns = [
     path("withdrawConfirm/", views.WithdrawConfirm.as_view(), name = "withdraw_confirm"),
     path("adminLogin/", views.AdminLogin.as_view(), name="admin_login"),
     path("adminMain/", views.AdminMain.as_view(), name="admin_main"),
-    
+    path("buyItem/", views.BuyItem.as_view(), name = "buy_item"),
+    path("buyItemCommit/", views.BuyItemCommit.as_view(), name = "buy_item_commit"),
 ]
