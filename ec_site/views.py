@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 from django.views import generic
 from django.views.generic import View
+from django.urls import reverse
 from ec_site.models import ShoppingCategory,ShoppingItem, ShoppingItemsIncart, AccountUser
 from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, CreateUserForm, UpdateUserForm, AdminLoginForm
 
@@ -161,7 +162,26 @@ class CartCorrect(View):
     
     # def post(self, request, pk):
         
+class CartDelete(View):
+    def get(self, request,pk):
+        cart_item = ShoppingItemsIncart.objects.get(item_id=pk, user_id=request.session["user_id"])
+        item_detail = ShoppingItem.objects.get(item_id = cart_item.item_id)
 
+        context = {
+            "item_id": item_detail.item_id,
+            "name":item_detail.name,
+            "color": item_detail.color,
+            "manufacturer":item_detail.manufacturer,
+            "price": item_detail.price,
+            "amount": cart_item.amount,
+        }
+        return render(request, "ec_site/cartDelete.html", context)
+    
+    def post(self, request, pk):
+        cart_item = ShoppingItemsIncart.objects.get(item_id=pk, user_id=request.session["user_id"])
+        cart_item.delete()
+
+        return redirect(reverse("ec_site:cart"))
 
 class UserLogin(View):
     def get(self, request, *args, **kwargs):
