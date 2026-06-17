@@ -1,0 +1,36 @@
+{% load static %}
+<html>
+	<head>
+		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+		<title>アイテム削除</title>
+		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
+	</head>
+	<body>
+        <h1>下記アイテムを削除しますか？</h1>
+
+        <div class="item_delete">
+            <form action="{% url 'ec_site:cart_delete' item_id %}" method='POST'>
+                <!-- <input type="hidden" name="item_id" value="{{item_id}}"> -->
+
+                <table border="1">
+                    {% csrf_token %}
+                    <tr>
+                        <th>商品名</th>
+                        <th>商品の色</th>
+                        <th>メーカー名</th>
+                        <th>単価</th>
+                        <th>数量</th>
+                    </tr>
+                    <tr>
+                        <td>{{name}}</td>
+                        <td>{{color}}</td>
+                        <td>{{manufacturer}}</td>
+                        <td>{{price}}</td>
+                        <td>{{amount}}</td>
+                    </tr>
+                </table>
+                <input type="submit" value="削除"/>
+            </form>
+        </div>
+        <a href="/ec_site/">商品検索</a>へ<br><br>
+    </body>
