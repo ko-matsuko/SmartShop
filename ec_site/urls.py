@@ -18,4 +18,7 @@ urlpatterns = [
     path("updateUserInfo/", views.UpdateUserInfo.as_view(), name="update_user"),
     path("updateUserConfirm/", views.UpdateUserConfirm.as_view(), name="update_user_confirm"),
     path("withdrawConfirm/", views.WithdrawConfirm.as_view(), name = "withdraw_confirm"),
+    path("adminLogin/", views.AdminLogin.as_view(), name="admin_login"),
+    path("adminMain/", views.AdminMain.as_view(), name="admin_main"),
+    
 ]
