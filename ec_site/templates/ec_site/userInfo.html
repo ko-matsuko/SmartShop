@@ -28,6 +28,30 @@
                     <td>{{user.address}}</td>
                 </tr>
             </table>
+            <br>
+            <h3>購入履歴</h3>
+            <table border="1">
+                <tr>
+                    <th>注文日</th>
+                    <th>商品名</th>
+                    <th>商品の色</th>
+                    <th>メーカー名</th>
+                    <th>注文数</th>
+                    <th>価格</th>
+                </tr>
+                {% for purchase in purchase_list %}          
+                    {% for detail in purchase.shoppingpurchasedetail_set.all %}
+                    <tr>
+                        <td>{{ purchase.booked_date }}</td>
+                        <td>{{ detail.item.name }}</td>
+                        <td>{{ detail.item.color }}</td>
+                        <td>{{ detail.item.manufacturer }}</td>
+                        <td>{{ detail.amount }}</td>
+                        <td>{{ detail.item.price }}</td>
+                    </tr>
+                    {% endfor %}
+                {% endfor %}
+            </table>
         </div>
         <br>
         <div class="links">
