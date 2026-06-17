@@ -611,8 +611,12 @@ class AdminLogout(View):
 
 class AdminPurchaseLog(View):
     def get(self, request, *args, **kwargs):
-        user_id = request.session["user_id"]
-        purchase_list = ShoppingPurchase.objects.filter(cancel=False).order_by("-booked_date").prefetch_related(Prefetch("shoppingpurchasedetail_set",queryset=ShoppingPurchaseDetail.objects.select_related("item")))
+        purchase_list = ShoppingPurchase.objects.filter(cancel=False).order_by("-booked_date").prefetch_related(
+            Prefetch(
+                "shoppingpurchasedetail_set",
+                queryset=ShoppingPurchaseDetail.objects.select_related("item")
+                )
+            )
         user_list = AccountUser.objects.all()
         item_list = ShoppingItem.objects.all()
         context = {
@@ -625,7 +629,7 @@ class AdminPurchaseLog(View):
     def post(self, request, *args, **kwargs):
         
         keyword = request.POST.get("keyword", "").strip()
-        purchase_list = ShoppingPurchase.objects.order_by("-booked_date").prefetch_related(
+        purchase_list = ShoppingPurchase.objects.filter(cancel=False).order_by("-booked_date").prefetch_related(
             Prefetch(
                 "shoppingpurchasedetail_set",
                 queryset=ShoppingPurchaseDetail.objects.select_related("item")
