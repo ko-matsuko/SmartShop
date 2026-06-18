@@ -2,15 +2,15 @@
 {% block title %}退会の確認｜SmartShop{% endblock %}
 {% block content %}
 <div class="wrap" style="max-width:480px;">
-  <nav class="crumb"><a href="/ec_site/updateUserInfo/">会員情報の変更</a> › 退会</nav>
+  <nav class="crumb"><a href="/ec_site/userInfo/">マイページ</a> › 退会</nav>
   <h1 class="ptitle">本当に退会しますか？</h1>
   <p class="psub">この操作は取り消せません。会員情報と購入履歴がすべて削除されます。</p>
   <main class="formcard" style="width:auto;">
     <p style="font-size:14px;margin:0 0 20px;">{{ name }} さんのアカウントを退会します。</p>
     <form method="POST" style="display:flex;gap:12px;">
       {% csrf_token %}
-      <a class="btn btn-secondary" href="/ec_site/updateUserInfo/" style="flex:1;">やめる</a>
-      <button type="submit" class="act del" style="flex:1;border:1px solid var(--coral-press);height:46px;border-radius:var(--radius-pill);font-size:15px;">退会する</button>
+      <a class="btn btn-secondary" href="/ec_site/userInfo/" style="flex:1;">やめる</a>
+      <button type="submit" class="act del" style="flex:1;justify-content:center;border:1px solid var(--coral-press);height:46px;border-radius:var(--radius-pill);font-size:15px;">退会する</button>
     </form>
   </main>
 </div>

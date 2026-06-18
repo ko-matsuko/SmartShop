@@ -4,12 +4,23 @@
 <head>
   <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ご注文完了｜SmartShop</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@500;600;700;800&family=Pacifico&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{% static 'ec_site/css/smartshop.css' %}" />
+  <style>
+    .done-card { position:relative; overflow:visible; }
+    .thanks-stamp {
+      position:absolute; top:-20px; right:-8px;
+      font-family:"Pacifico",cursive; color:#e8362f;
+      font-size:36px; line-height:1; transform:rotate(13deg);
+      text-shadow:0 2px 0 #fff, 0 4px 8px rgba(232,54,47,.22);
+      pointer-events:none; white-space:nowrap;
+    }
+  </style>
 </head>
 <body>
   <div class="done-wrap">
     <div class="done-card">
+      <div class="thanks-stamp">Thank you!</div>
       <img class="mascot" src="{% static 'ec_site/img/mascot/thanks.png' %}" alt="ありがとう" />
       <h1>ご注文ありがとうございます</h1>
       <p>ご注文を受け付けました。<br>注文番号：<b class="num">{{ purchase.purchase_id }}</b><br>お届け先：{{ purchase.destination }}</p>

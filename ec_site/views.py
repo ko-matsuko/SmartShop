@@ -404,6 +404,7 @@ class AdminMain(View):
 class BuyItem(View):
     def get(self, request, *args, **kwargs):
         user_id = request.session.get("user_id")
+        user = AccountUser.objects.get(user_id=user_id)
         cart = ShoppingItemsIncart.objects.filter(user_id=user_id)
 
         total = 0
@@ -414,6 +415,7 @@ class BuyItem(View):
         context = {
             "cart": cart,
             "total": total,
+            "address": user.address,  # お届け先の初期値に登録済み住所を使用
         }
 
         return render(request, "ec_site/buyItem.html", context)
@@ -421,6 +423,7 @@ class BuyItem(View):
     def post(self, request, *args, **kwargs):
         # セッションからログインユーザーID取得
         user_id = request.session.get("user_id")
+        user = AccountUser.objects.get(user_id=user_id)
         cart = ShoppingItemsIncart.objects.filter(user_id=user_id)
 
         total = 0
@@ -431,6 +434,7 @@ class BuyItem(View):
         context = {
             "cart": cart,
             "total": total,
+            "address": user.address,  # お届け先の初期値に登録済み住所を使用
         }
 
         return render(request, "ec_site/buyItem.html", context)
