@@ -16,4 +16,9 @@
     {% endfor %}
   </div>
 </div>
+<div>
+  {% for r in ranking %}
+    <p>{{ forloop.counter }}位: {{ r.item__name }}</p>
+ {% endfor %}
+</div>
 {% endblock %}

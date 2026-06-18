@@ -9,14 +9,22 @@ from django.db.models import Prefetch
 from datetime import datetime
 from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, CreateUserForm, UpdateUserForm, AdminLoginForm
 from django.db.models import Q, Prefetch
+from django.db.models import Sum
+from django.db.models import F
 
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
         queryset = ShoppingCategory.objects.all()
+        ranking = (ShoppingPurchaseDetail.objects
+                .values("item", "item__name")
+                .annotate(total_amount=Sum("amount"))
+                .order_by("-total_amount")
+                )
         context = {
             "category_list": queryset,
             "item_list": ShoppingItem.objects.all().order_by("item_id"),
+            "ranking":ranking,
         }
         return render(request, "ec_site/main.html", context)
 
@@ -686,8 +694,26 @@ class AdminPurchaseLog(View):
         status = request.POST.get("status", "active")
 
         if cancel_id:
-            ShoppingPurchase.objects.filter(purchase_id=cancel_id).update(cancel=True)
+            purchase = ShoppingPurchase.objects.prefetch_related(
+                Prefetch(
+                    "shoppingpurchasedetail_set",
+                    queryset=ShoppingPurchaseDetail.objects.select_related("item")
+                )
+            ).filter(purchase_id=cancel_id).first()
 
+            # まだキャンセルされていないときだけ実行
+            if purchase and not purchase.cancel:
+                for detail in purchase.shoppingpurchasedetail_set.all():
+                    # 在庫を戻す
+                    ShoppingItem.objects.filter(
+                        item_id=detail.item.item_id
+                    ).update(stock=F("stock") + detail.amount)
+
+                # キャンセルフラグを立てる
+                purchase.cancel = True
+                purchase.save()
+
+                
         keyword = request.POST.get("keyword", "").strip()
 
         purchase_list = ShoppingPurchase.objects.all().order_by("-booked_date").prefetch_related(
