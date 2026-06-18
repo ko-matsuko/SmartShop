@@ -558,11 +558,20 @@ class BuyItemCommit(View):
         new_purchase.save()
         
         cart_items = ShoppingItemsIncart.objects.filter(user=user)
+        detail_count = ShoppingPurchaseDetail.objects.count()
         total = 0
         for cart_item in cart_items:
             total += cart_item.item.price * cart_item.amount  # 購入金額の合計
             item = cart_item.item
             item.stock -= cart_item.amount
+
+            detail_count += 1
+            purchase_detail = ShoppingPurchaseDetail()
+            purchase_detail.purchase_detail_id = detail_count
+            purchase_detail.purchase = new_purchase
+            purchase_detail.item = item
+            purchase_detail.amount = cart_item.amount
+            purchase_detail.save()
 
             if item.stock < 0:
                 item.stock = 0
@@ -759,15 +768,13 @@ class AdminPurchaseLog(View):
                 )
             ).filter(purchase_id=cancel_id).first()
 
-            # まだキャンセルされていないときだけ実行
             if purchase and not purchase.cancel:
                 for detail in purchase.shoppingpurchasedetail_set.all():
-                    # 在庫を戻す
+                    
                     ShoppingItem.objects.filter(
                         item_id=detail.item.item_id
                     ).update(stock=F("stock") + detail.amount)
 
-                # キャンセルフラグを立てる
                 purchase.cancel = True
                 purchase.save()
 
