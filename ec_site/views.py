@@ -793,10 +793,6 @@ class AdminPurchaseLog(View):
         else:
             purchase_list = purchase_list.filter(cancel=False)
 
-        for purchase in purchase_list:
-            for d in purchase.shoppingpurchasedetail_set.all():
-                d.total_price = d.item.price * d.amount
-
         if keyword:
             purchase_list = purchase_list.filter(
                 Q(purchase_id__icontains=keyword) |
@@ -804,6 +800,10 @@ class AdminPurchaseLog(View):
                 Q(user__name__icontains=keyword) |
                 Q(shoppingpurchasedetail__item__name__icontains=keyword)
             ).distinct()
+
+        for purchase in purchase_list:
+            for d in purchase.shoppingpurchasedetail_set.all():
+                d.total_price = d.item.price * d.amount
 
         context = {
             "keyword": keyword,
