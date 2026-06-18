@@ -1,7 +1,30 @@
 {% extends "ec_site/base_store.html" %}
+{% load static %}
 {% block title %}商品検索｜SmartShop{% endblock %}
 {% block content %}
 <div class="wrap">
+
+  {% if ranking %}
+  <section class="rank-sec">
+    <div class="rank-head">
+      <h2>売れ筋ランキング</h2>
+      <span>いま人気のアイテム</span>
+    </div>
+    <div class="rank-row">
+      {% for r in ranking|slice:":5" %}
+      <a class="rank-card" href="/ec_site/itemDetail/{{ r.item }}">
+        <span class="rank-no rank-no-{{ forloop.counter }}">{{ forloop.counter }}</span>
+        <div class="rank-thumb"><img src="{% get_static_prefix %}ec_site/img/products/{{ r.item }}.png" alt="{{ r.item__name }}" loading="lazy" /></div>
+        <div class="rank-info">
+          <h3 class="rank-name">{{ r.item__name }}</h3>
+          <span class="rank-metric">累計 {{ r.total_amount }} 点</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
   <div class="results-head">
     <div>
       <div class="h">すべての商品</div>
@@ -15,10 +38,5 @@
       <div class="empty">商品がありません。</div>
     {% endfor %}
   </div>
-</div>
-<div>
-  {% for r in ranking %}
-    <p>{{ forloop.counter }}位: {{ r.item__name }}</p>
- {% endfor %}
 </div>
 {% endblock %}
