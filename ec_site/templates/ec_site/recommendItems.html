@@ -1,0 +1,42 @@
+{% extends "ec_site/base_store.html" %}
+{% load static %}
+{% block title %}あわせて購入｜SmartShop{% endblock %}
+{% block content %}
+<div class="wrap" style="max-width:1100px;">
+  <h1 class="ptitle">あわせていかがですか？</h1>
+  <p class="psub">お買い物をもっと便利に。おすすめの商品をご紹介します。</p>
+
+  <form method="POST" action="{% url 'ec_site:recommend_items' %}">
+    {% csrf_token %}
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;margin-bottom:32px;">
+      {% for item in recommend_items %}
+      <label class="tablecard" style="cursor:pointer;display:block;padding:16px;position:relative;">
+        <input type="checkbox" name="add_items" value="{{ item.item_id }}"
+               style="position:absolute;top:14px;right:14px;width:18px;height:18px;accent-color:var(--primary);">
+        <div class="lthumb" style="width:100%;height:160px;margin-bottom:12px;overflow:hidden;border-radius:8px;">
+          <img src="{% get_static_prefix %}ec_site/img/products/{{ item.item_id }}.png"
+               alt="{{ item.name }}"
+               style="width:100%;height:100%;object-fit:cover;">
+        </div>
+        <h3 class="ln" style="font-size:14px;margin:0 0 4px;">{{ item.name }}</h3>
+        <div class="lmeta" style="margin-bottom:8px;">{{ item.color }}</div>
+        <div class="num" style="font-size:16px;font-weight:700;">¥{{ item.price }}</div>
+      </label>
+      {% empty %}
+      <p style="grid-column:1/-1;color:var(--text-muted);">現在おすすめできる商品がありません。</p>
+      {% endfor %}
+    </div>
+
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-primary" type="submit" style="min-width:220px;">
+        選んだ商品を追加して注文確定へ
+      </button>
+      <a class="btn" href="{% url 'ec_site:buy_item_commit_get' %}"
+         style="min-width:180px;text-align:center;line-height:2.4;">
+        追加せずに注文確定へ
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}
