@@ -6,7 +6,7 @@
   <h1 class="ptitle">購入手続き</h1>
   <p class="psub">ご注文内容をご確認ください</p>
 
-  <form method="POST" action="{% url 'ec_site:recommend_items' %}"></form>
+  <form method="POST" action="{% url 'ec_site:buy_item_commit' %}">
     {% csrf_token %}
     <div class="layout">
       <div>
