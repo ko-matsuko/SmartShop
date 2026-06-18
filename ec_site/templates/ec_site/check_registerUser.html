@@ -1,40 +1,37 @@
 {% load static %}
-<html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<title>会員登録の確認</title>
-		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-	</head>
-    <body>
-        <h1>以下の情報で登録しますか？</h1>
-
-        <div class="check_register_user">
-            <form action="{% url 'ec_site:check_registerUser' %}" method="POST">
-                {% csrf_token %}
-                <table border="1">
-                    <tr>
-                        <th>会員ID:</th>
-                        <td>{{user_id}}</td>
-                    </tr>
-                    <tr>
-                        <th>パスワード:</th>
-                        <td>*****</td>
-                    </tr>
-                    <tr>
-                        <th>名前:</th>
-                        <td>{{name}}</td>
-                    </tr>
-                    <tr>
-                        <th>ご住所:</th>
-                        <td>{{address}}</td>
-                    </tr>
-                </table>
-                <input type="hidden" name="user_id" value="{{ user_id }}">
-                <input type="hidden" name="password" value="{{ password }}">
-                <input type="hidden" name="name" value="{{ name }}">
-                <input type="hidden" name="address" value="{{ address }}">
-                <input type="submit" value="登録">
-            </form>
-        </div>
-        <a href="/ec_site/">商品検索</a>へ<br>
-    </body>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>登録内容の確認｜SmartShop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'ec_site/css/smartshop.css' %}" />
+</head>
+<body>
+  <div class="auth">
+    <a class="brand-top" href="/ec_site/">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3h2.2l1.3 12.1a1.5 1.5 0 0 0 1.5 1.34h9.1a1.5 1.5 0 0 0 1.46-1.14L21 7.2H6.1" stroke="#22303f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="#ff7a45"/><circle cx="17.5" cy="20" r="1.6" fill="#ff7a45"/></svg>
+      <span class="wm"><span class="a1">Smart</span><span class="a2">Shop</span></span>
+    </a>
+    <div style="text-align:center;margin:0 0 22px;">
+      <h1 style="font-size:22px;font-weight:700;margin:0 0 4px;">登録内容の確認</h1>
+      <p style="font-size:13px;color:var(--ink-soft);margin:0;">以下の内容で登録します。よろしいですか？</p>
+    </div>
+    <main class="formcard">
+      <div class="drow" style="border-top:none;"><span class="k">会員ID</span><span>{{ user_id }}</span></div>
+      <div class="drow"><span class="k">パスワード</span><span>••••••••</span></div>
+      <div class="drow"><span class="k">お名前</span><span>{{ name }}</span></div>
+      <div class="drow"><span class="k">ご住所</span><span>{{ address }}</span></div>
+      <form method="POST" action="{% url 'ec_site:check_registerUser' %}" style="margin-top:20px;display:flex;gap:12px;">
+        {% csrf_token %}
+        <input type="hidden" name="user_id" value="{{ user_id }}" />
+        <input type="hidden" name="password" value="{{ password }}" />
+        <input type="hidden" name="name" value="{{ name }}" />
+        <input type="hidden" name="address" value="{{ address }}" />
+        <a class="btn btn-secondary" href="/ec_site/registerUser/">修正する</a>
+        <button type="submit" class="btn btn-primary" style="flex:1;">登録する</button>
+      </form>
+    </main>
+  </div>
+</body>
+</html>

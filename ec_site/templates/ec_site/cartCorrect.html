@@ -1,46 +1,29 @@
+{% extends "ec_site/base_store.html" %}
 {% load static %}
-<html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<title>ショッピングカート修正</title>
-		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-	</head>
-	<body>
-        <h1>ショッピングカート内の商品修正</h1>
-
-        <div class="amount_correct">
-            <form action="{% url 'ec_site:cart' %}" method='POST'>
-                <input type="hidden" name="item_id" value="{{item_id}}">
-
-                <table border="1">
-                    {% csrf_token %}
-                    <tr>
-                        <th>商品名</th>
-                        <th>商品の色</th>
-                        <th>メーカー名</th>
-                        <th>単価</th>
-                        <th>数量</th>
-                    </tr>
-                    <tr>
-                        <td>{{name}}</td>
-                        <td>{{color}}</td>
-                        <td>{{manufacturer}}</td>
-                        <td>{{price}}</td>
-                        <td>
-                            <select name = "amount" id = "amount">
-                                {% for i in num_list %}
-                                    {% if i == amount %}
-                                        <option value="{{i}}" selected>{{i}}</option>
-                                    {% else %}
-                                        <option value="{{i}}">{{i}}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                        </td>
-                    </tr>
-                </table>
-                <input type="submit" value="修正"/>
-            </form>
-        </div>
-        <a href="/ec_site/">商品検索</a>へ<br><br>
-    </body>
+{% block title %}数量の変更｜SmartShop{% endblock %}
+{% block content %}
+<div class="wrap" style="max-width:560px;">
+  <nav class="crumb"><a href="/ec_site/cart/">カート</a> › 数量の変更</nav>
+  <h1 class="ptitle">数量の変更</h1>
+  <p class="psub">カート内の数量を変更します</p>
+  <main class="formcard" style="width:auto;">
+    <div class="litem" style="box-shadow:none;border:1px solid var(--line);margin-bottom:18px;">
+      <div class="lthumb"><img src="{% get_static_prefix %}ec_site/img/products/{{ item_id }}.png" alt="{{ name }}" /></div>
+      <div class="linfo"><div class="lm">{{ manufacturer }}</div><h3 class="ln">{{ name }}</h3><div class="lmeta">{{ color }} ・ ¥{{ price }}</div></div>
+    </div>
+    <form method="POST" action="/ec_site/cart/">
+      {% csrf_token %}
+      <input type="hidden" name="item_id" value="{{ item_id }}" />
+      <div class="field"><label for="amount">数量</label>
+        <select id="amount" name="amount">
+          {% for n in num_list %}<option value="{{ n }}" {% if n == amount %}selected{% endif %}>{{ n }}</option>{% endfor %}
+        </select>
+      </div>
+      <div style="display:flex;gap:12px;">
+        <a class="btn btn-secondary" href="/ec_site/cart/">キャンセル</a>
+        <button type="submit" class="btn btn-primary" style="flex:1;">数量を更新する</button>
+      </div>
+    </form>
+  </main>
+</div>
+{% endblock %}

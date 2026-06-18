@@ -1,32 +1,20 @@
 {% load static %}
-<html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<title>購入確定</title>
-		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-	</head>
-
-    <body>
-
-        <h1>購入が完了しました</h1>
-    
-        <p>ご注文ありがとうございます。</p>
-    
-        <hr>
-    
-        <h2>注文情報</h2>
-    
-        <p>注文番号：{{ purchase.purchase_id }}</p>
-        <p>注文日時：{{ purchase.booked_date }}</p>
-        <p>配送先：{{ purchase.destination }}</p>
-    
-        <hr>
-    
-        <a href="/ec_site/">商品検索</a>へ<br>
-    
-    </body>
-    
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ご注文完了｜SmartShop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'ec_site/css/smartshop.css' %}" />
+</head>
+<body>
+  <div class="done-wrap">
+    <div class="done-card">
+      <img class="mascot" src="{% static 'ec_site/img/mascot/thanks.png' %}" alt="ありがとう" />
+      <h1>ご注文ありがとうございます</h1>
+      <p>ご注文を受け付けました。<br>注文番号：<b class="num">{{ purchase.purchase_id }}</b><br>お届け先：{{ purchase.destination }}</p>
+      <a class="btn btn-primary" href="/ec_site/">お買い物を続ける</a>
+    </div>
+  </div>
+</body>
 </html>
-
-
-

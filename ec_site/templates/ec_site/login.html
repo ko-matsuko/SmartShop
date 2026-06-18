@@ -1,25 +1,46 @@
 {% load static %}
-<html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<title>会員ログイン</title>
-		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-	</head>
-	<body>
-        <div class="login_content">
-			<h1>ログインしてください。</h1><br>
-			<div class="form">
-            <form action="{% url 'ec_site:user_login' %}" method='POST'>
-                {% csrf_token %}
-                <table>
-                    {{login_form.as_table}}
-                </table>
-                <input type="submit" value="ログイン">
-			</form>
-			</div>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ログイン｜SmartShop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'ec_site/css/smartshop.css' %}" />
+</head>
+<body>
+  <div class="auth">
+    <a class="brand-top" href="/ec_site/">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3h2.2l1.3 12.1a1.5 1.5 0 0 0 1.5 1.34h9.1a1.5 1.5 0 0 0 1.46-1.14L21 7.2H6.1" stroke="#22303f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="#ff7a45"/><circle cx="17.5" cy="20" r="1.6" fill="#ff7a45"/></svg>
+      <span class="wm"><span class="a1">Smart</span><span class="a2">Shop</span></span>
+    </a>
+
+    <div class="greet">
+      <div class="bubble">ようこそ！<br><b>Smart<span class="o">Shop</span></b> へ！</div>
+      <img class="mascot" src="{% static 'ec_site/img/mascot/welcome.png' %}" alt="SmartShop マスコット" />
+    </div>
+
+    <main class="formcard">
+      <form method="POST" novalidate>
+        {% csrf_token %}
+        {% if login_form.non_field_errors %}
+          <div class="errbox">{% for e in login_form.non_field_errors %}{{ e }}{% endfor %}</div>
+        {% endif %}
+        <div class="field">
+          <label for="id_user_id">会員ID</label>
+          {{ login_form.user_id }}
         </div>
-        <div class="usercreate">
-            <a href="/ec_site/registerUser">会員登録</a><br />
+        <div class="field">
+          <label for="id_password">パスワード</label>
+          {{ login_form.password }}
         </div>
-	</body>
+        <button type="submit" class="btn btn-primary btn-block">ログイン</button>
+      </form>
+    </main>
+
+    <p class="foot-link">SmartShop は初めてですか？ <a href="/ec_site/registerUser/">新規会員登録</a></p>
+  </div>
+</body>
 </html>
