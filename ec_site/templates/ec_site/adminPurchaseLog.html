@@ -5,6 +5,17 @@
 {% block content %}
 <form class="toolbar" method="POST" action="/ec_site/adminPurchaseLog/">
   {% csrf_token %}
+  <div style="margin-bottom:10px;">
+    <a href="?status=active"
+      {% if status == 'active' %}style="font-weight:bold;"{% endif %}>
+      通常注文
+    </a>
+  
+    <a href="?status=canceled"
+      {% if status == 'canceled' %}style="font-weight:bold;"{% endif %}>
+      キャンセル済み
+    </a>
+  </div>
   <input type="text" name="keyword" value="{{ keyword }}" placeholder="注文者・商品名・注文IDで検索" />
   <button class="btn-add" type="submit" style="background:var(--ink);">検索</button>
   <span class="count">{{ purchase_list|length }}件の注文</span>
@@ -12,7 +23,7 @@
 
 <div class="tablecard">
   <table class="data">
-    <thead><tr><th>注文日</th><th>注文ID</th><th>注文者</th><th>商品名</th><th>商品の色</th><th>メーカー名</th><th class="r">注文数</th><th class="r">価格</th></tr></thead>
+    <thead><tr><th>注文日</th><th>注文ID</th><th>注文者</th><th>商品名</th><th>商品の色</th><th>メーカー名</th><th class="r">注文数</th><th class="r">価格</th><th>操作</th></tr></thead>
     <tbody>
       {% for purchase in purchase_list %}
         {% for d in purchase.shoppingpurchasedetail_set.all %}
@@ -24,7 +35,25 @@
           <td>{{ d.item.color }}</td>
           <td>{{ d.item.manufacturer }}</td>
           <td class="r num">{{ d.amount }}</td>
-          <td class="r price2">¥{{ d.item.price }}</td>
+          <td class="r price2">¥{{ d.total_price }}</td>
+          
+          {% if forloop.first %}
+            <td rowspan="{{ purchase.shoppingpurchasedetail_set.all|length }}">
+              {% if status == "active" %}
+                <form method="POST">
+                  {% csrf_token %}
+                  <input type="hidden" name="cancel_id" value="{{ purchase.purchase_id }}">
+                  <input type="hidden" name="status" value="{{ status }}">
+                  <button type="submit" style="color:red;">
+                    キャンセル
+                  </button>
+                </form>
+              {% else %}
+                <span style="color:gray;">キャンセル済</span>
+              {% endif %}
+            </td>
+          {% endif %}
+
         </tr>
         {% endfor %}
       {% empty %}

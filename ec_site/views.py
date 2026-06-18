@@ -625,43 +625,67 @@ class AdminLogout(View):
 
 class AdminPurchaseLog(View):
     def get(self, request, *args, **kwargs):
-        purchase_list = ShoppingPurchase.objects.filter(cancel=False).order_by("-booked_date").prefetch_related(
-            Prefetch(
-                "shoppingpurchasedetail_set",
-                queryset=ShoppingPurchaseDetail.objects.select_related("item")
-                )
-            )
-        user_list = AccountUser.objects.all()
-        item_list = ShoppingItem.objects.all()
-        context = {
-            "purchase_list": purchase_list,
-            "user_list": user_list,
-            "item_list": item_list,
-        }
-        return render(request, "ec_site/adminPurchaseLog.html",context)
+        status = request.GET.get("status", "active")  # active / canceled
 
-    def post(self, request, *args, **kwargs):
-        
-        keyword = request.POST.get("keyword", "").strip()
-        purchase_list = ShoppingPurchase.objects.filter(cancel=False).order_by("-booked_date").prefetch_related(
+        purchase_list = ShoppingPurchase.objects.all().order_by("-booked_date").prefetch_related(
             Prefetch(
                 "shoppingpurchasedetail_set",
                 queryset=ShoppingPurchaseDetail.objects.select_related("item")
             )
         )
 
+        if status == "canceled":
+            purchase_list = purchase_list.filter(cancel=True)
+        else:
+            purchase_list = purchase_list.filter(cancel=False)
+
+        for purchase in purchase_list:
+            for d in purchase.shoppingpurchasedetail_set.all():
+                d.total_price = d.item.price * d.amount
+
+        context = {
+            "purchase_list": purchase_list,
+            "status": status,
+        }
+        return render(request, "ec_site/adminPurchaseLog.html", context)
+
+    def post(self, request, *args, **kwargs):
+
+        cancel_id = request.POST.get("cancel_id")
+        status = request.POST.get("status", "active")
+
+        if cancel_id:
+            ShoppingPurchase.objects.filter(purchase_id=cancel_id).update(cancel=True)
+
+        keyword = request.POST.get("keyword", "").strip()
+
+        purchase_list = ShoppingPurchase.objects.all().order_by("-booked_date").prefetch_related(
+            Prefetch(
+                "shoppingpurchasedetail_set",
+                queryset=ShoppingPurchaseDetail.objects.select_related("item")
+            )
+        )
+
+        if status == "canceled":
+            purchase_list = purchase_list.filter(cancel=True)
+        else:
+            purchase_list = purchase_list.filter(cancel=False)
+
+        for purchase in purchase_list:
+            for d in purchase.shoppingpurchasedetail_set.all():
+                d.total_price = d.item.price * d.amount
+
         if keyword:
-           purchase_list = purchase_list.filter(
+            purchase_list = purchase_list.filter(
                 Q(purchase_id__icontains=keyword) |
                 Q(destination__icontains=keyword) |
                 Q(user__name__icontains=keyword) |
-                Q(shoppingpurchasedetail__item__name__icontains=keyword) |
-                Q(shoppingpurchasedetail__item__manufacturer__icontains=keyword) |
-                Q(shoppingpurchasedetail__item__color__icontains=keyword)
+                Q(shoppingpurchasedetail__item__name__icontains=keyword)
             ).distinct()
-           
+
         context = {
             "keyword": keyword,
             "purchase_list": purchase_list,
+            "status": status,
         }
         return render(request, "ec_site/adminPurchaseLog.html", context)
