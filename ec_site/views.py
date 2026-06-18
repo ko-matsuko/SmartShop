@@ -11,7 +11,7 @@ from ec_site.forms import UserLoginForm, SearchFormCategory, SearchFormKeyword, 
 from django.db.models import Q, Prefetch
 from django.db.models import Sum
 from django.db.models import F
-
+import random
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
@@ -459,10 +459,68 @@ class BuyItem(View):
             "address": user.address,  # お届け先の初期値に登録済み住所を使用
         }
 
+        return redirect("ec_site:recommend_items")
+    
+class RecommendItems(View):
+    def get(self, request, *args, **kwargs):
+        user_id = request.session.get("user_id")
+        cart = ShoppingItemsIncart.objects.filter(user_id=user_id)
+
+        # カート内商品のIDを取得（おすすめ候補から除外するため）
+        cart_item_ids = [c.item.item_id for c in cart]
+
+        # カート内と同じカテゴリの商品を候補に（カテゴリフィールドがない場合は全商品から）
+        recommend_items = (
+            ShoppingItem.objects
+            .exclude(item_id__in=cart_item_ids)
+            .filter(stock__gt=0)
+            .order_by("?")[:4]  # ランダムに最大4件
+        )
+
+        context = {
+            "recommend_items": recommend_items,
+        }
+        return render(request, "ec_site/recommendItems.html", context)
+
+    def post(self, request, *args, **kwargs):
+        # おすすめ商品をカートに追加
+        user_id = request.session.get("user_id")
+        user = AccountUser.objects.get(user_id=user_id)
+
+        selected_ids = request.POST.getlist("add_items")  # チェックされた商品ID群
+        for item_id in selected_ids:
+            item = ShoppingItem.objects.get(item_id=item_id)
+            cart_entry, created = ShoppingItemsIncart.objects.get_or_create(
+                user=user,
+                item=item,
+                defaults={"amount": 1},
+            )
+            if not created:
+                cart_entry.amount += 1
+                cart_entry.save()
+
+        # おすすめをスキップまたは追加後、注文確定へ
+        return redirect("ec_site:buy_item_commit_get")
+
+class BuyItemCommitGet(View):
+    """注文確定前の最終確認画面（GET）"""
+    def get(self, request, *args, **kwargs):
+        user_id = request.session.get("user_id")
+        user = AccountUser.objects.get(user_id=user_id)
+        cart = ShoppingItemsIncart.objects.filter(user_id=user_id)
+
+        total = 0
+        for c in cart:
+            c.subtotal = c.item.price * c.amount
+            total += c.subtotal
+
+        context = {
+            "cart": cart,
+            "total": total,
+            "address": user.address,
+        }
         return render(request, "ec_site/buyItem.html", context)
     
-
-
 class BuyItemCommit(View):
     RANKS = {
         "plain":   {"mascot": "plain.png",   "title": "ご注文を承りました",
