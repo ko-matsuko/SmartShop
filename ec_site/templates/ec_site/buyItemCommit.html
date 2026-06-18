@@ -6,26 +6,45 @@
   <title>ご注文完了｜SmartShop</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@500;600;700;800&family=Pacifico&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{% static 'ec_site/css/smartshop.css' %}" />
-  <style>
-    .done-card { position:relative; overflow:visible; }
-    .thanks-stamp {
-      position:absolute; top:-20px; right:-8px;
-      font-family:"Pacifico",cursive; color:#e8362f;
-      font-size:36px; line-height:1; transform:rotate(13deg);
-      text-shadow:0 2px 0 #fff, 0 4px 8px rgba(232,54,47,.22);
-      pointer-events:none; white-space:nowrap;
-    }
-  </style>
 </head>
 <body>
-  <div class="done-wrap">
+  <div class="done-wrap rank-{{ rank }}" data-rank="{{ rank }}">
+    <div class="confetti" aria-hidden="true"></div>
     <div class="done-card">
       <div class="thanks-stamp">Thank you!</div>
-      <img class="mascot" src="{% static 'ec_site/img/mascot/thanks.png' %}" alt="ありがとう" />
-      <h1>ご注文ありがとうございます</h1>
-      <p>ご注文を受け付けました。<br>注文番号：<b class="num">{{ purchase.purchase_id }}</b><br>お届け先：{{ purchase.destination }}</p>
+      <span class="ribbon">★ PREMIUM ORDER ★</span>
+      <img class="mascot" src="{% get_static_prefix %}ec_site/img/mascot/{{ mascot }}" alt="" />
+      <h1>{{ title|safe }}</h1>
+      <p>{{ message }}<br>注文番号：<b class="num">{{ purchase.purchase_id }}</b><br>お届け先：{{ purchase.destination }}</p>
       <a class="btn btn-primary" href="/ec_site/">お買い物を続ける</a>
     </div>
   </div>
+  <script>
+    (function(){
+      var wrap = document.querySelector('.done-wrap');
+      if(!wrap) return;
+      var rank = wrap.dataset.rank;
+      var counts = { delight:34, premium:60 };
+      var pal = {
+        delight:['#ff7a45','#ffb23e','#ff9a6b','#ffd27a'],
+        premium:['#e8a93b','#f6d977','#ff7a45','#ffe6a3','#ffffff']
+      };
+      var n = counts[rank];
+      if(!n) return;
+      var box = wrap.querySelector('.confetti');
+      var colors = pal[rank];
+      for(var i=0;i<n;i++){
+        var s = document.createElement('i');
+        s.style.left = (Math.random()*100) + '%';
+        s.style.background = colors[i % colors.length];
+        s.style.animationDuration = (3 + Math.random()*2.5) + 's';
+        s.style.animationDelay = (-Math.random()*5) + 's';
+        s.style.width = (6 + Math.random()*6) + 'px';
+        s.style.height = (10 + Math.random()*8) + 'px';
+        if(Math.random() < 0.4) s.style.borderRadius = '50%';
+        box.appendChild(s);
+      }
+    })();
+  </script>
 </body>
 </html>

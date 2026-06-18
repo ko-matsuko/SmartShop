@@ -1,0 +1,35 @@
+{% extends "ec_site/base_store.html" %}
+{% load static %}
+{% block title %}購入履歴｜SmartShop{% endblock %}
+{% block content %}
+<div class="wrap" style="max-width:900px;">
+  <h1 class="ptitle">購入履歴</h1>
+  <p class="psub">これまでのご注文を確認できます</p>
+
+  <div class="tablecard">
+    <div style="padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;justify-content:space-between;">
+      <h2 style="font-size:16px;font-weight:700;margin:0;">ご注文一覧</h2>
+      <span style="font-size:12.5px;color:var(--ink-soft);">{{ purchase_list|length }}件の注文</span>
+    </div>
+    <table class="data">
+      <thead><tr><th>注文日</th><th>商品名</th><th>商品の色</th><th>メーカー名</th><th class="r">注文数</th><th class="r">価格</th></tr></thead>
+      <tbody>
+        {% for purchase in purchase_list %}
+          {% for d in purchase.shoppingpurchasedetail_set.all %}
+          <tr>
+            <td class="id">{{ purchase.booked_date|date:"Y/m/d" }}</td>
+            <td class="iname">{{ d.item.name }}</td>
+            <td>{{ d.item.color }}</td>
+            <td>{{ d.item.manufacturer }}</td>
+            <td class="r num">{{ d.amount }}</td>
+            <td class="r price2">¥{{ d.item.price }}</td>
+          </tr>
+          {% endfor %}
+        {% empty %}
+          <tr><td colspan="6" style="text-align:center;padding:40px 0;color:var(--ink-soft);">購入履歴がありません。</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

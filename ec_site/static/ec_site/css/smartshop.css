@@ -3,6 +3,7 @@
    配置: ec_site/static/ec_site/css/smartshop.css
    読み込み: {% load static %}<link rel="stylesheet" href="{% static 'ec_site/css/smartshop.css' %}">
    ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@500;600;700;800&display=swap');
 
 :root {
   --cream:#fbf6ef; --cream-2:#f3eadd; --white:#fff;
@@ -193,6 +194,36 @@ table.spec th { width:170px; background:#faf5ee; color:var(--ink-soft); font-wei
 .done-card .mascot { width:120px; height:auto; margin:0 auto 14px; display:block; mix-blend-mode:multiply; }
 .done-card h1 { font-size:22px; font-weight:700; margin:0 0 10px; }
 .done-card p { font-size:14px; color:var(--ink-soft); line-height:1.8; margin:0 0 24px; }
+
+/* ---------- 完了画面 金額ランク演出 ---------- */
+.done-card { position:relative; z-index:2; }
+.done-card .ribbon { display:none; }
+.thanks-stamp { position:absolute; top:14px; right:24px; font-family:"Pacifico",cursive; color:#e8362f; font-size:30px; line-height:1; transform:rotate(-8deg); text-shadow:0 2px 0 #fff,0 4px 8px rgba(232,54,47,.22); opacity:0; pointer-events:none; white-space:nowrap; }
+.confetti { position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:1; }
+.confetti i { position:absolute; top:-26px; width:9px; height:14px; border-radius:2px; opacity:.9; animation:ss-fall linear infinite; }
+@keyframes ss-fall { 0%{ transform:translateY(-30px) rotate(0); opacity:0; } 10%{ opacity:.95; } 100%{ transform:translateY(110vh) rotate(560deg); opacity:.9; } }
+
+/* Lv1 質素（無表情） */
+.done-wrap.rank-plain { background:#f4f1ec; }
+.rank-plain .done-card { box-shadow:none; border-color:var(--line-2); }
+.rank-plain .done-card .mascot { width:96px; }
+
+/* Lv2 標準（にっこり） */
+.rank-smile .done-card .mascot { width:118px; }
+
+/* Lv3 華やか（大喜び） */
+.done-wrap.rank-delight { background:radial-gradient(120% 90% at 50% 0%, #fff5ec 0%, var(--cream) 60%); }
+.rank-delight .done-card { box-shadow:0 20px 50px -22px rgba(242,105,31,.5); border-color:var(--coral-soft); }
+.rank-delight .done-card .mascot { width:132px; }
+.rank-delight .thanks-stamp { opacity:1; }
+
+/* Lv4 最上級（豪華） */
+.done-wrap.rank-premium { background:radial-gradient(130% 100% at 50% -10%, #fff6e0 0%, #fdeede 45%, var(--cream) 100%); }
+.rank-premium .done-card { width:480px; border:2px solid #f0c44d; box-shadow:0 26px 70px -24px rgba(214,158,40,.7); }
+.rank-premium .done-card::before { content:""; position:absolute; inset:-2px; border-radius:inherit; padding:2px; background:linear-gradient(135deg,#f6d977,#e8a93b,#f6d977); -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
+.rank-premium .done-card .mascot { width:170px; }
+.rank-premium .done-card h1 { font-size:25px; background:linear-gradient(90deg,#c98a16,#e8a93b,#c98a16); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.rank-premium .ribbon { display:inline-flex; align-items:center; gap:6px; margin:-4px auto 14px; font-size:12px; font-weight:800; letter-spacing:.04em; padding:6px 16px; border-radius:var(--radius-pill); background:linear-gradient(90deg,#e8a93b,#f3c969); color:#5a3d06; box-shadow:0 6px 16px -8px rgba(214,158,40,.8); }
 
 /* ---------- 管理画面（業務寄り） ---------- */
 .admin-body { display:flex; min-height:100vh; background:#f4f1ec; }
