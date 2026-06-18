@@ -441,7 +441,8 @@ class BuyItemCommit(View):
         new_purchase = ShoppingPurchase()
         user_id=request.session.get("user_id")
         user= AccountUser.objects.get(user_id = user_id)
-        
+
+        detail_count = ShoppingPurchaseDetail.objects.count()
 
         today_str = datetime.now().strftime("%Y%m%d")
         count_today = ShoppingPurchase.objects.filter(purchase_id__startswith=today_str).count()
@@ -456,6 +457,14 @@ class BuyItemCommit(View):
         for cart_item in cart_items:
             item = cart_item.item
             item.stock -= cart_item.amount
+
+            detail_count += 1
+            purchase_detail = ShoppingPurchaseDetail()
+            purchase_detail.purchase_detail_id = detail_count
+            purchase_detail.purchase = new_purchase
+            purchase_detail.item = item
+            purchase_detail.amount = cart_item.amount
+            purchase_detail.save()
 
             if item.stock < 0:
                 item.stock = 0

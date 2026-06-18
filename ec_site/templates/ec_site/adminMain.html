@@ -6,6 +6,7 @@
 <h2 style="font-size:22px;font-weight:700;margin:0 0 4px;">ようこそ、{{ request.session.admin_id }} さん</h2>
 <p style="font-size:13.5px;color:var(--ink-soft);margin:0 0 24px;">管理メニューから操作を選んでください</p>
 
+
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
   <a class="who-card" href="/ec_site/adminItemList/" style="box-shadow:none;">
     <div class="avatar" style="background:var(--cream-2);color:var(--ink);"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
@@ -24,3 +25,16 @@
   </a>
 </div>
 {% endblock %}
+
+    <h3>ようこそ管理者{{request.session.admin_id}} さん</h3>
+
+    <div class="links">
+
+        <a href="/ec_site/adminItemList/">商品検索画面へ</a><br><br>
+        <a href="/ec_site/adminItemCreate/">商品登録</a><br><br>
+        <a href="/ec_site">ログアウト</a>
+        <a href="/ec_site/adminPurchaseLog/">購入の履歴検索</a><br><br>
+    </div>
+</body>
+</html>
+
