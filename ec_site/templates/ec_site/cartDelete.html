@@ -1,36 +1,20 @@
+{% extends "ec_site/base_store.html" %}
 {% load static %}
-<html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<title>アイテム削除</title>
-		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-	</head>
-	<body>
-        <h1>下記アイテムを削除しますか？</h1>
-
-        <div class="item_delete">
-            <form action="{% url 'ec_site:cart_delete' item_id %}" method='POST'>
-                <!-- <input type="hidden" name="item_id" value="{{item_id}}"> -->
-
-                <table border="1">
-                    {% csrf_token %}
-                    <tr>
-                        <th>商品名</th>
-                        <th>商品の色</th>
-                        <th>メーカー名</th>
-                        <th>単価</th>
-                        <th>数量</th>
-                    </tr>
-                    <tr>
-                        <td>{{name}}</td>
-                        <td>{{color}}</td>
-                        <td>{{manufacturer}}</td>
-                        <td>{{price}}</td>
-                        <td>{{amount}}</td>
-                    </tr>
-                </table>
-                <input type="submit" value="削除"/>
-            </form>
-        </div>
-        <a href="/ec_site/">商品検索</a>へ<br><br>
-    </body>
+{% block title %}削除の確認｜SmartShop{% endblock %}
+{% block content %}
+<div class="wrap" style="max-width:560px;">
+  <nav class="crumb"><a href="/ec_site/cart/">カート</a> › 削除</nav>
+  <h1 class="ptitle">この商品をカートから削除しますか？</h1>
+  <main class="formcard" style="width:auto;">
+    <div class="litem" style="box-shadow:none;border:1px solid var(--line);margin-bottom:18px;">
+      <div class="lthumb"><img src="{% get_static_prefix %}ec_site/img/products/{{ item_id }}.png" alt="{{ name }}" /></div>
+      <div class="linfo"><div class="lm">{{ manufacturer }}</div><h3 class="ln">{{ name }}</h3><div class="lmeta">{{ color }} ・ ¥{{ price }} ・ 数量 {{ amount }}</div></div>
+    </div>
+    <form method="POST" style="display:flex;gap:12px;">
+      {% csrf_token %}
+      <a class="btn btn-secondary" href="/ec_site/cart/" style="flex:1;">やめる</a>
+      <button type="submit" class="act del" style="flex:1;border:1px solid var(--coral-press);height:46px;border-radius:var(--radius-pill);font-size:15px;">削除する</button>
+    </form>
+  </main>
+</div>
+{% endblock %}

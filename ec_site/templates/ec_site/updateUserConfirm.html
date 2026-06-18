@@ -1,41 +1,24 @@
-{% load static %}
-<html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<title>会員情報の更新</title>
-		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-	</head>
-    <body>
-        <h1>以下の会員情報で更新しますか？</h1>
+{% extends "ec_site/base_store.html" %}
+{% block title %}変更内容の確認｜SmartShop{% endblock %}
+{% block content %}
+<div class="wrap" style="max-width:560px;">
+  <nav class="crumb"><a href="/ec_site/userInfo/">マイページ</a> › 会員情報の変更 › 確認</nav>
+  <h1 class="ptitle">変更内容の確認</h1>
+  <p class="psub">以下の内容で更新します。よろしいですか？</p>
 
-        <div class="update_user_confirm">
-            <form action="{% url 'ec_site:update_user_confirm' %}" method="POST">
-                {% csrf_token %}
-                <table border="1">
-                    <tr>
-                        <th>会員ID:</th>
-                        <td>{{user_id}}</td>
-                    </tr>
-                    <tr>
-                        <th>パスワード:</th>
-                        <td>*****</td>
-                    </tr>
-                    <tr>
-                        <th>名前:</th>
-                        <td>{{name}}</td>
-                    </tr>
-                    <tr>
-                        <th>ご住所:</th>
-                        <td>{{address}}</td>
-                    </tr>
-                </table>
-                <input type="hidden" name="password" value="{{ password }}">
-                <input type="hidden" name="name" value="{{ name }}">
-                <input type="hidden" name="address" value="{{ address }}">
-                <input type="submit" value="変更">
-            </form>
-        </div>
-
-        <div class="links">
-            <a href="/ec_site/">商品検索</a>へ<br>
-        </div>
+  <main class="formcard" style="width:auto;">
+    <div class="drow" style="border-top:none;"><span class="k">会員ID</span><span>{{ user_id }}</span></div>
+    <div class="drow"><span class="k">パスワード</span><span>••••••••</span></div>
+    <div class="drow"><span class="k">お名前</span><span>{{ name }}</span></div>
+    <div class="drow"><span class="k">ご住所</span><span>{{ address }}</span></div>
+    <form method="POST" action="{% url 'ec_site:update_user_confirm' %}" style="display:flex;gap:12px;margin-top:20px;">
+      {% csrf_token %}
+      <input type="hidden" name="password" value="{{ password }}" />
+      <input type="hidden" name="name" value="{{ name }}" />
+      <input type="hidden" name="address" value="{{ address }}" />
+      <a class="btn btn-secondary" href="/ec_site/updateUserInfo/">修正する</a>
+      <button type="submit" class="btn btn-primary" style="flex:1;">この内容で更新する</button>
+    </form>
+  </main>
+</div>
+{% endblock %}

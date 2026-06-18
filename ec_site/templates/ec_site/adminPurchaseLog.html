@@ -1,77 +1,36 @@
-{% load static %}
-<html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<title>購入履歴</title>
-		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-	</head>
-    <body>
-        <h1>購入履歴</h1>
+{% extends "ec_site/base_admin.html" %}
+{% block title %}購入履歴｜SmartShop 管理{% endblock %}
+{% block heading %}購入履歴{% endblock %}
+{% block nav_log %}on{% endblock %}
+{% block content %}
+<form class="toolbar" method="POST" action="/ec_site/adminPurchaseLog/">
+  {% csrf_token %}
+  <input type="text" name="keyword" value="{{ keyword }}" placeholder="注文者・商品名・注文IDで検索" />
+  <button class="btn-add" type="submit" style="background:var(--ink);">検索</button>
+  <span class="count">{{ purchase_list|length }}件の注文</span>
+</form>
 
-		<div class="content">
-			{% csrf_token %}
-            <form action="{% url 'ec_site:admin_PurchaseLog'%}" method='POST'>
-            {% csrf_token %}
-            <tr>
-                <!--
-                <td>注文者:</td>
-                <td>
-                    <select name="user" id="id_user">
-                        <option value="0" selected>すべて</option>
-                        {% for user in user_list %}
-                            <option value="{{user.id_user}}">{{user.name}}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-                <td>商品名:</td>
-                <td>
-                    <select name="item" id="id_item">
-                        <option value="0" selected>すべて</option>
-                        {% for item in item_list %}
-                            <option value="{{item.id_item}}">{{item.name}}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-                -->
-            </td>
-
-                <td>キーワード:</td>
-                <td><input type="text" name="keyword" class="text"></td>
-            </tr>
-            <input type='submit' value='検索' />
-            </form>
-			<div class="purchase_list">
-				<table border="1">
-                    <tr>
-                        <th>注文日</th>
-                        <th>注文者</th>
-                        <th>商品名</th>
-                        <th>商品の色</th>
-                        <th>メーカー名</th>
-                        <th>注文数</th>
-                        <th>価格</th>
-                    </tr>
-                    {% for purchase in purchase_list %}          
-                        {% for detail in purchase.shoppingpurchasedetail_set.all %}
-                        <tr>
-                            <td>{{ purchase.booked_date }}</td>
-                            <td>{{ purchase.user_id}}</td>
-                            <td>{{ detail.item.name }}</td>
-                            <td>{{ detail.item.color }}</td>
-                            <td>{{ detail.item.manufacturer }}</td>
-                            <td>{{ detail.amount }}</td>
-                            <td>{{ detail.item.price }}</td>
-                        </tr>
-                        {% endfor %}
-                    {% endfor %}
-                </table>
-			</div>
-
-			<br>
-			<div class="link">
-				<a href="/ec_site/adminMain/">管理者メインページ</a>へ<br><br>
-			</div>
-			
-		</div>
-    </body>
-</html>
+<div class="tablecard">
+  <table class="data">
+    <thead><tr><th>注文日</th><th>注文ID</th><th>注文者</th><th>商品名</th><th>商品の色</th><th>メーカー名</th><th class="r">注文数</th><th class="r">価格</th></tr></thead>
+    <tbody>
+      {% for purchase in purchase_list %}
+        {% for d in purchase.shoppingpurchasedetail_set.all %}
+        <tr>
+          <td class="id">{{ purchase.booked_date|date:"Y/m/d" }}</td>
+          <td class="id">{{ purchase.purchase_id }}</td>
+          <td><span class="user-cell"><span class="ava">{{ purchase.user.name|slice:":1" }}</span>{{ purchase.user.name }}</span></td>
+          <td class="iname">{{ d.item.name }}</td>
+          <td>{{ d.item.color }}</td>
+          <td>{{ d.item.manufacturer }}</td>
+          <td class="r num">{{ d.amount }}</td>
+          <td class="r price2">¥{{ d.item.price }}</td>
+        </tr>
+        {% endfor %}
+      {% empty %}
+        <tr><td colspan="8" style="text-align:center;padding:40px 0;color:var(--ink-soft);">該当する注文が見つかりませんでした。</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

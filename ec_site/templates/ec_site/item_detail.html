@@ -1,58 +1,58 @@
+{% extends "ec_site/base_store.html" %}
 {% load static %}
-<html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<title>商品詳細</title>
-		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-	</head>
-    <body>
-        <h1>商品の詳細表示</h1>
+{% block title %}{{ item.name }}｜SmartShop{% endblock %}
+{% block content %}
+<div class="wrap" style="max-width:1100px;">
+  <nav class="crumb"><a href="/ec_site/">ホーム</a> › <a href="/ec_site/">{{ item.category.name }}</a> › {{ item.name }}</nav>
 
-        <div class="item_detail">
-            <table border="1">
-                <tr>
-                    <td>商品名</td>
-                    <th>{{item.name}}</th>
-                </tr>
-                <tr>
-                    <td>商品の色</td>
-                    <th>{{item.color}}</th>
-                </tr>
-                <tr>
-                    <td>メーカー名</td>
-                    <th>{{item.manufacturer}}</th>
-                </tr>
-                <tr>
-                    <td>価格</td>
-                    <th>{{item.price}}円</th>
-                </tr>
-                <tr>
-                    <td>在庫数</td>
-                    <th>{{item.stock}}個</th>
-                </tr>
-            </table>
-        </div>
+  <div class="detail">
+    <div>
+      <div class="main-img">
+        {% if item.recommended %}<span class="badge">★ オススメ</span>{% endif %}
+        <img src="{% get_static_prefix %}ec_site/img/products/{{ item.item_id }}.png" alt="{{ item.name }}" />
+      </div>
+    </div>
 
-        <div class="item_purchase">
-            <form action="{% url 'ec_site:cart' %}" method='POST'>
-            {% csrf_token %}
-            <input type="hidden" name="item_id" value="{{item.item_id}}">
-            <tr>
-                <th>数量</th>
-                <td>
-                    <select name = "amount" id = "amount">
-                        {% for i in num_list %}
-                        <option value="{{i}}">{{i}}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-            </tr>
+    <div>
+      <div class="maker">{{ item.manufacturer }}</div>
+      <h1>{{ item.name }}</h1>
+      <div class="pmeta" style="margin-bottom:18px;">
+        <span class="color-chip" style="border:1px solid var(--line-2);border-radius:999px;padding:5px 12px;font-size:13px;"><span class="dot" style="width:15px;height:15px;border-radius:999px;box-shadow:0 0 0 1px var(--line-2);background:{% if item.color == 'ブラウン' %}#8b5e3c{% elif item.color == 'ベージュ' %}#d9c3a3{% elif item.color == 'ブラック' %}#2b2b2b{% elif item.color == 'ネイビー' %}#2a3a5e{% elif item.color == 'ナチュラル' %}#e6dcc6{% else %}#cccccc{% endif %}"></span>{{ item.color }}</span>
+      </div>
+      <div class="price"><span class="yen">¥</span><span class="val">{{ item.price }}</span><span class="tax">税込</span></div>
+      <div style="font-size:13.5px;color:{% if item.stock <= 15 %}var(--coral-press){% else %}var(--ink-soft){% endif %};margin-top:8px;">
+        {% if item.stock > 0 %}在庫 <b>{% if item.stock <= 15 %}残り{{ item.stock }}点 ・ お早めに{% else %}あり{% endif %}</b>{% else %}申し訳ございません、在庫切れです{% endif %}
+      </div>
 
-            <input type="submit" value="ショッピングカートに入れる"/>
+      <div class="buybox">
+        <form action="/ec_site/cart/" method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="item_id" value="{{ item.item_id }}" />
+          <div class="qtyrow">
+            <span class="lab">数量</span>
+            <select name="amount">
+              {% for n in num_list %}<option value="{{ n }}">{{ n }}</option>{% endfor %}
+            </select>
+          </div>
+          <button class="btn btn-primary btn-block" type="submit" {% if item.stock == 0 %}disabled{% endif %}>
+            <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M2.5 3h2.2l1.3 12.1a1.5 1.5 0 0 0 1.5 1.34h9.1a1.5 1.5 0 0 0 1.46-1.14L21 7.2H6.1" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            カートに入れる
+          </button>
         </form>
-        </div>
+      </div>
+    </div>
+  </div>
 
-        <a href="/ec_site/">商品検索</a>へ<br>
-    </body>
-
-</html>
+  <div style="margin-top:54px;">
+    <h2 style="font-size:18px;font-weight:700;margin:0 0 16px;">商品情報</h2>
+    <table class="spec">
+      <tr><th>商品名</th><td>{{ item.name }}</td></tr>
+      <tr><th>商品の色</th><td>{{ item.color }}</td></tr>
+      <tr><th>メーカー名</th><td>{{ item.manufacturer }}</td></tr>
+      <tr><th>価格</th><td>{{ item.price }}円（税込）</td></tr>
+      <tr><th>在庫数</th><td>{{ item.stock }}個</td></tr>
+      <tr><th>カテゴリ</th><td>{{ item.category.name }}</td></tr>
+    </table>
+  </div>
+</div>
+{% endblock %}

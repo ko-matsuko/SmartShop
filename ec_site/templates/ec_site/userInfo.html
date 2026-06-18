@@ -1,61 +1,50 @@
+{% extends "ec_site/base_store.html" %}
 {% load static %}
-<html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<title>会員情報の確認</title>
-		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-	</head>
-    <body>
-        <h1>会員情報</h1>
+{% block title %}マイページ｜SmartShop{% endblock %}
+{% block content %}
+<div class="wrap" style="max-width:1100px;">
+  <h1 class="ptitle">マイページ</h1>
+  <p class="psub">会員情報と購入履歴を確認できます</p>
 
-        <div class="user_info">
-            <table border="1">
-                {% csrf_token %}
-                <tr>
-                    <th>会員ID</th>
-                    <td>{{user.user_id}}</td>
-                </tr>
-                <tr>
-                    <th>パスワード</th>
-                    <td>表示なし</td>
-                </tr>
-                <tr>
-                    <th>お名前</th>
-                    <td>{{user.name}}</td>
-                </tr>
-                <tr>
-                    <th>ご住所</th>
-                    <td>{{user.address}}</td>
-                </tr>
-            </table>
-            <br>
-            <h3>購入履歴</h3>
-            <table border="1">
-                <tr>
-                    <th>注文日</th>
-                    <th>商品名</th>
-                    <th>商品の色</th>
-                    <th>メーカー名</th>
-                    <th>注文数</th>
-                    <th>価格</th>
-                </tr>
-                {% for purchase in purchase_list %}          
-                    {% for detail in purchase.shoppingpurchasedetail_set.all %}
-                    <tr>
-                        <td>{{ purchase.booked_date }}</td>
-                        <td>{{ detail.item.name }}</td>
-                        <td>{{ detail.item.color }}</td>
-                        <td>{{ detail.item.manufacturer }}</td>
-                        <td>{{ detail.amount }}</td>
-                        <td>{{ detail.item.price }}</td>
-                    </tr>
-                    {% endfor %}
-                {% endfor %}
-            </table>
-        </div>
-        <br>
-        <div class="links">
-            <a href="/ec_site/updateUserInfo/">会員情報の変更</a><br>
-            <a href="/ec_site/">商品検索</a>へ<br><br>
-        </div>
-    </body>
+  <div class="layout" style="grid-template-columns:320px 1fr;">
+    <div class="who-card">
+      <div class="avatar"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="1.8"/><path d="M4 21a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div style="font-size:18px;font-weight:700;">{{ user.name }}</div>
+      <div style="font-size:12.5px;color:var(--ink-soft);font-family:var(--font-display);margin-bottom:14px;">{{ user.user_id }}</div>
+      <div class="drow"><span class="k">会員ID</span><span>{{ user.user_id }}</span></div>
+      <div class="drow"><span class="k">お名前</span><span>{{ user.name }}</span></div>
+      <div class="drow"><span class="k">ご住所</span><span>{{ user.address }}</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:20px;">
+        <a class="btn btn-secondary" href="/ec_site/updateUserInfo/">会員情報を変更</a>
+        <a class="btn" style="color:var(--ink-soft);" href="/ec_site/userLogout/">ログアウト</a>
+      </div>
+    </div>
+
+    <div class="tablecard">
+      <div style="padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;justify-content:space-between;">
+        <h2 style="font-size:16px;font-weight:700;margin:0;">購入履歴</h2>
+        <span style="font-size:12.5px;color:var(--ink-soft);">{{ purchase_list|length }}件の注文</span>
+      </div>
+      <table class="data">
+        <thead><tr><th>注文日</th><th>商品名</th><th>商品の色</th><th>メーカー名</th><th class="r">注文数</th><th class="r">価格</th></tr></thead>
+        <tbody>
+          {% for purchase in purchase_list %}
+            {% for d in purchase.shoppingpurchasedetail_set.all %}
+            <tr>
+              <td class="id">{{ purchase.booked_date|date:"Y/m/d" }}</td>
+              <td class="iname">{{ d.item.name }}</td>
+              <td>{{ d.item.color }}</td>
+              <td>{{ d.item.manufacturer }}</td>
+              <td class="r num">{{ d.amount }}</td>
+              <td class="r price2">¥{{ d.item.price }}</td>
+            </tr>
+            {% endfor %}
+          {% empty %}
+            <tr><td colspan="6" style="text-align:center;padding:40px 0;color:var(--ink-soft);">購入履歴がありません。</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% comment %}AdminItemForm の入力欄。create / update で共通利用{% endcomment %}
+<div class="grid2">
+  <div class="field"><label for="id_category">カテゴリ</label>{{ form.category }}</div>
+  <div class="field"><label for="id_color">色</label>{{ form.color }}</div>
+  <div class="field full"><label for="id_name">商品名</label>{{ form.name }}</div>
+  <div class="field full"><label for="id_manufacturer">メーカー</label>{{ form.manufacturer }}</div>
+  <div class="field"><label for="id_price">価格（円）</label>{{ form.price }}</div>
+  <div class="field"><label for="id_stock">在庫（個）</label>{{ form.stock }}</div>
+</div>
+<label class="recrow">
+  <div><div class="txt">おすすめ商品にする</div><div style="font-size:11.5px;color:var(--ink-soft);font-weight:400;">検索結果で「★ オススメ」バッジを表示します</div></div>
+  {{ form.recommended }}
+</label>
+{% if form.non_field_errors %}<div class="errbox" style="margin-top:16px;">{% for e in form.non_field_errors %}{{ e }}<br>{% endfor %}</div>{% endif %}

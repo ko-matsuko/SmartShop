@@ -1,60 +1,45 @@
+{% extends "ec_site/base_store.html" %}
 {% load static %}
-<html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<title>購入内容確認</title>
-		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-	</head>
-    <body>
-        <h2>購入内容確認</h2>
-    
-        <form method="post" action="{% url 'ec_site:buy_item_commit' %}">
-            {% csrf_token %}
-    
-            <!-- 購入アイテム一覧 -->
-            <h3>購入アイテム</h3>
-            <table border="1">
-                <tr>
-                    <th>商品名</th>
-                    <th>個数</th>
-                    <th>小計</th>
-                </tr>
-            
-                {% for item in cart %}
-                <tr>
-                    <td>{{ item.item.name }}</td>
-                    <td>{{ item.amount }}</td>
-                    <td>{{ item.subtotal }}円</td>
-                </tr>
-                {% endfor %}
-            </table>
-            
-            <p>合計金額：{{ total }}円</p>
-    
-            <p id="total"></p>
-    
-            <!-- ユーザー情報 -->
-            <h3>お届け先情報</h3>
-            <p>お名前：{{ cart.0.user.name }}</p>
-            <p>住所：<input type="text" name="address" value="{{ cart.0.user.address }}" size="50"></p>
-            <p>支払方法：<select name="payment_method"><option value="cod">代金引換</option></select></p>
+{% block title %}購入手続き｜SmartShop{% endblock %}
+{% block content %}
+<div class="wrap" style="max-width:1100px;">
+  <h1 class="ptitle">購入手続き</h1>
+  <p class="psub">ご注文内容をご確認ください</p>
 
-    
-            <!-- 購入ボタン -->
-        {% if cart %}
-            <button type="submit">購入する</button>
-        {% else %}
-            <button type="submit" disabled>購入する（カートが空です）</button>
-        {% endif %}        
-        </form>
-        <div class="links">
-            <a href="/ec_site/">商品検索</a>へ<br>
+  <form method="POST" action="{% url 'ec_site:buy_item_commit' %}">
+    {% csrf_token %}
+    <div class="layout">
+      <div>
+        <div class="tablecard" style="margin-bottom:20px;">
+          <h2 style="font-size:15px;font-weight:700;margin:0;padding:16px 22px;border-bottom:1px solid var(--line);">購入アイテム</h2>
+          <div style="padding:8px 22px;">
+            {% for c in cart %}
+            <div class="litem" style="border:none;box-shadow:none;border-radius:0;padding:14px 0;border-bottom:1px solid var(--line);grid-template-columns:56px 1fr auto;gap:14px;margin:0;">
+              <div class="lthumb" style="width:56px;height:56px;"><img src="{% get_static_prefix %}ec_site/img/products/{{ c.item.item_id }}.png" alt="{{ c.item.name }}" /></div>
+              <div class="linfo"><h3 class="ln" style="font-size:14px;margin:0 0 2px;">{{ c.item.name }}</h3><div class="lmeta">{{ c.item.color }} ・ 個数 {{ c.amount }}</div></div>
+              <div class="lsub num">¥{{ c.subtotal }}</div>
+            </div>
+            {% endfor %}
+          </div>
         </div>
-    </body>
-</html>
 
+        <div class="tablecard">
+          <h2 style="font-size:15px;font-weight:700;margin:0;padding:16px 22px;border-bottom:1px solid var(--line);">お届け先情報</h2>
+          <div style="padding:20px 22px;">
+            <div class="field"><label for="address">お届け先ご住所</label><input type="text" id="address" name="address" placeholder="東京都〇〇区..." required /></div>
+            <div class="field" style="margin-bottom:0;"><label>お支払い方法</label><select><option>代金引換</option></select></div>
+          </div>
+        </div>
+      </div>
 
-
-
-
-
+      <div class="summary">
+        <h3>ご注文内容</h3>
+        <div class="srow"><span>商品の小計</span><span class="v">¥{{ total }}</span></div>
+        <div class="stot"><span class="lbl">お支払い合計</span><span class="amt num">¥{{ total }}<small>税込</small></span></div>
+        <button class="btn btn-primary btn-block" type="submit">注文を確定する</button>
+        <a class="foot-link" style="display:block;text-align:center;margin:16px 0 0;" href="/ec_site/cart/">← カートに戻る</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,41 +1,52 @@
+{% extends "ec_site/base_store.html" %}
 {% load static %}
-<html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<title>ショッピングカート</title>
-		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-	</head>
-    <body>
-        <h1>ショッピングカート内の商品一覧</h1><br>
+{% block title %}ショッピングカート｜SmartShop{% endblock %}
+{% block content %}
+<div class="wrap" style="max-width:1100px;">
+  <h1 class="ptitle">ショッピングカート</h1>
+  <p class="psub">{{ item_list|length }}件の商品</p>
 
-        <table border="1">
-            {% csrf_token %}
-            <tr>
-                <th>商品名</th>
-                <th>商品の色</th>
-                <th>メーカー名</th>
-                <th>単価</th>
-                <th>数量</th>
-            </tr>
-            {% for item in item_list %}
-                <tr>
-                    <td>{{item.name}}</td>
-                    <td>{{item.color}}</td>
-                    <td>{{item.manufacturer}}</td>
-                    <td>{{item.price}}</td>
-                    <td>{{item.amount}}</td>
-			        <td><a href="/ec_site/cartCorrect/{{item.item_id}}">修正</a></td>
-			        <td><a href="/ec_site/cartDelete/{{item.item_id}}">削除</a></td>
-                </tr>
-            {% endfor %}
-        </table>
+  {% if item_list %}
+  <div class="layout">
+    <div class="items">
+      {% for item in item_list %}
+      <div class="litem">
+        <div class="lthumb"><img src="{% get_static_prefix %}ec_site/img/products/{{ item.item_id }}.png" alt="{{ item.name }}" /></div>
+        <div class="linfo">
+          <div class="lm">{{ item.manufacturer }}</div>
+          <h3 class="ln">{{ item.name }}</h3>
+          <div class="lmeta">
+            <span class="color-chip"><span class="dot" style="width:13px;height:13px;border-radius:999px;box-shadow:0 0 0 1px var(--line-2);background:{% if item.color == 'ブラウン' %}#8b5e3c{% elif item.color == 'ベージュ' %}#d9c3a3{% elif item.color == 'ブラック' %}#2b2b2b{% elif item.color == 'ネイビー' %}#2a3a5e{% elif item.color == 'ナチュラル' %}#e6dcc6{% else %}#cccccc{% endif %}"></span>{{ item.color }}</span>
+            <span class="num">単価 ¥{{ item.price }} ・ 数量 {{ item.amount }}</span>
+          </div>
+        </div>
+        <div class="lright">
+          <div class="lsub num">¥{{ item.price }} <span style="font-size:12px;color:var(--ink-mute);">× {{ item.amount }}</span></div>
+          <div style="display:flex;gap:12px;">
+            <a href="/ec_site/cartCorrect/{{ item.item_id }}">修正</a>
+            <a class="del" href="/ec_site/cartDelete/{{ item.item_id }}">削除</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
 
-        <h3>合計{{charge_total}}円</h3><br>
-        <form action="{% url 'ec_site:buy_item' %}" method="POST">
-            {% csrf_token %}
-            <input type="submit" value="購入">
-        </form>
-
-        <a href="/ec_site/">商品検索</a>へ<br><br>
-    </body>
-
+    <div class="summary">
+      <h3>ご注文内容</h3>
+      <div class="srow"><span>商品の小計</span><span class="v">¥{{ charge_total }}</span></div>
+      <div class="stot"><span class="lbl">合計</span><span class="amt num">¥{{ charge_total }}<small>税込</small></span></div>
+      <form action="{% url 'ec_site:buy_item' %}" method="POST">
+        {% csrf_token %}
+        <button class="btn btn-primary btn-block" type="submit">レジに進む</button>
+      </form>
+      <a class="foot-link" style="display:block;text-align:center;margin:16px 0 0;" href="/ec_site/">← お買い物を続ける</a>
+    </div>
+  </div>
+  {% else %}
+  <div class="tablecard" style="padding:60px 20px;text-align:center;color:var(--ink-soft);">
+    <p>カートに商品がありません。</p>
+    <a class="btn btn-primary" href="/ec_site/" style="margin-top:8px;">お買い物をはじめる</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,49 +1,19 @@
-{% load static %}
-<html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<title>商品検索</title>
-		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-	</head>
-	<body>
-        <div class="content">
-			<h1>商品の検索を行います。</h1><br>
-            <form action="{% url 'ec_site:search_result'%}" method='POST'>
-            {% csrf_token %}
-            <tr>
-                <td>カテゴリ:</td>
-                <td>
-                    <select name="category" id="id_category">
-                        <option value="0" selected>すべて</option>
-                        {% for category in category_list %}
-                            <option value="{{category.category_id}}">{{category.name}}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-                <td>キーワード:</td>
-                <td><input type="text" name="keyword" class="text"></td>
-            </tr>
-            <input type='submit' value='検索' />
-            </form>
-        </div>
-        <br>
-        <div class="links">
-            <a href="/ec_site/cart/">ショッピングカートを見る</a>
-        </div>
-        <br><br>
-        <div class="nonlogin_only">
-            {% if not request.session.is_login %}
-                <a href="/ec_site/userLogin/">ログイン</a><br><br>
-            {% endif %}
-        </div>
-        <div class="login_only">
-            {% if request.session.is_login %}
-                <h3>ようこそ{{request.session.name}}さん</h3><br>
-                <a href="/ec_site/userInfo/">会員情報の確認</a><br><br>
-                <a href="/ec_site/updateUserInfo/">会員情報の変更</a><br><br>
-                <a href="/ec_site/userLogout/">ログアウト</a><br>
-            {% endif %}        
-        </div>
-        <a href="/ec_site/adminLogin/">管理者ログイン</a>
-	</body>
-</html>
+{% extends "ec_site/base_store.html" %}
+{% block title %}商品検索｜SmartShop{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="results-head">
+    <div>
+      <div class="h">すべての商品</div>
+      <div class="c">{{ item_list|length }}件の商品</div>
+    </div>
+  </div>
+  <div class="grid">
+    {% for item in item_list %}
+      {% include "ec_site/_pcard.html" %}
+    {% empty %}
+      <div class="empty">商品がありません。</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
