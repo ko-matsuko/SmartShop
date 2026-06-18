@@ -16,6 +16,7 @@ class IndexView(View):
         queryset = ShoppingCategory.objects.all()
         context = {
             "category_list": queryset,
+            "item_list": ShoppingItem.objects.all().order_by("item_id"),
         }
         return render(request, "ec_site/main.html", context)
 
