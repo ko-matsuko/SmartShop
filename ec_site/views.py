@@ -36,7 +36,10 @@ class IndexView(View):
     
 class SearchResult(View):
     def get(self, request, *args, **kwargs):
-        return render(request, "ec_site/search_result.html")
+        context = {
+            "category_list": ShoppingCategory.objects.all(),  # ヘッダーのカテゴリ選択を全カテゴリ表示
+        }
+        return render(request, "ec_site/search_result.html", context)
     
     def post(self, request, *args, **kwargs):
         category_id = int(request.POST["category"])
@@ -53,7 +56,8 @@ class SearchResult(View):
         context = {
             "category": category_name,
             "keyword": keyword,
-            "item_list": queryset
+            "item_list": queryset,
+            "category_list": ShoppingCategory.objects.all(),  # ヘッダーのカテゴリ選択を全カテゴリ表示
         }
         return render(request, "ec_site/search_result.html", context)
     
@@ -225,15 +229,25 @@ class UserInfo(View):
     def get(self, request, *args, **kwargs):
         user_id = request.session["user_id"]
         queryset = AccountUser.objects.get(user_id = user_id)
-        
-        purchase_list = ShoppingPurchase.objects.filter(user__user_id=user_id, cancel=False).order_by("-booked_date").prefetch_related(Prefetch("shoppingpurchasedetail_set",queryset=ShoppingPurchaseDetail.objects.select_related("item")))
-
 
         context = {
-            "purchase_list": purchase_list,
             "user":queryset,
         }
         return render(request, "ec_site/userInfo.html",context)
+
+
+class PurchaseHistory(View):
+    def get(self, request, *args, **kwargs):
+        if not request.session.get('is_login', None):
+            return redirect('/ec_site/userLogin')
+
+        user_id = request.session["user_id"]
+        purchase_list = ShoppingPurchase.objects.filter(user__user_id=user_id, cancel=False).order_by("-booked_date").prefetch_related(Prefetch("shoppingpurchasedetail_set", queryset=ShoppingPurchaseDetail.objects.select_related("item")))
+
+        context = {
+            "purchase_list": purchase_list,
+        }
+        return render(request, "ec_site/purchaseHistory.html", context)
 
 class UpdateUserInfo(View):
     def get(self, request, *args, **kwargs):
@@ -442,12 +456,31 @@ class BuyItem(View):
 
 
 class BuyItemCommit(View):
+    RANKS = {
+        "plain":   {"mascot": "plain.png",   "title": "ご注文を承りました",
+                    "message": "ご注文を受け付けました。"},
+        "smile":   {"mascot": "welcome.png", "title": "ご注文ありがとうございます",
+                    "message": "ご注文を受け付けました。"},
+        "delight": {"mascot": "thanks.png",  "title": "たくさんのお買い上げありがとうございます！",
+                    "message": "またのご利用を心よりお待ちしております。"},
+        "premium": {"mascot": "premium.png", "title": "特別なお客様へ、<br>最大級のありがとうを。",
+                    "message": "SmartShopより心ばかりの感謝を込めて。"},
+    }
+
+    def rank_for(self, total):
+        if total <= 5000:
+            return "plain"
+        elif total <= 20000:
+            return "smile"
+        elif total <= 50000:
+            return "delight"
+        return "premium"
+
     def post(self, request, *args, **kwargs):
         new_purchase = ShoppingPurchase()
         user_id=request.session.get("user_id")
         user= AccountUser.objects.get(user_id = user_id)
-
-        detail_count = ShoppingPurchaseDetail.objects.count()
+        
 
         today_str = datetime.now().strftime("%Y%m%d")
         count_today = ShoppingPurchase.objects.filter(purchase_id__startswith=today_str).count()
@@ -459,17 +492,11 @@ class BuyItemCommit(View):
         new_purchase.save()
         
         cart_items = ShoppingItemsIncart.objects.filter(user=user)
+        total = 0
         for cart_item in cart_items:
+            total += cart_item.item.price * cart_item.amount  # 購入金額の合計
             item = cart_item.item
             item.stock -= cart_item.amount
-
-            detail_count += 1
-            purchase_detail = ShoppingPurchaseDetail()
-            purchase_detail.purchase_detail_id = detail_count
-            purchase_detail.purchase = new_purchase
-            purchase_detail.item = item
-            purchase_detail.amount = cart_item.amount
-            purchase_detail.save()
 
             if item.stock < 0:
                 item.stock = 0
@@ -478,9 +505,13 @@ class BuyItemCommit(View):
 
         ShoppingItemsIncart.objects.filter(user=user).delete()
 
+        rank = self.rank_for(total)  # 金額からランク判定
         context={
             "purchase":new_purchase,
+            "total": total,
+            "rank": rank,
         }
+        context.update(self.RANKS[rank])
         return render(request, "ec_site/buyItemCommit.html", context)
 
 
