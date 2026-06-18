@@ -1,12 +1,20 @@
 {% load static %}
-<html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<title>会員登録の完了</title>
-		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-	</head>
-	<body>
-        <h1>{{name}}さんの会員登録が完了しました。</h1><br><br>
-
-		<a href="/ec_site/userLogin">商品検索</a>へ<br><br>
-    </body>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>会員登録完了｜SmartShop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'ec_site/css/smartshop.css' %}" />
+</head>
+<body>
+  <div class="done-wrap">
+    <div class="done-card">
+      <img class="mascot" src="{% static 'ec_site/img/mascot/thanks.png' %}" alt="ありがとう" />
+      <h1>ようこそ、{{ name }} さん！</h1>
+      <p>会員登録が完了しました。<br>さっそくお買い物をはじめましょう。</p>
+      <a class="btn btn-primary" href="/ec_site/userLogin/">ログインする</a>
+    </div>
+  </div>
+</body>
+</html>

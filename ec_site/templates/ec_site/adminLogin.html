@@ -1,22 +1,30 @@
 {% load static %}
-<html>
-    <head>
-        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-        <title>管理者ログイン画面</title>
-        <link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-    </head>
-    <body>
-        <div class="login_content">
-            <h1>管理者ログイン</h1><br>
-            <div class="form">
-                <form action="{% url 'ec_site:admin_login' %}" method='POST'>
-                    {% csrf_token %}
-                    <table>
-                        {{login_form.as_table}}
-                    </table>
-                    <input type="submit" value="ログイン">
-                </form>
-            </div>
-        </div>
-    </body>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>管理者ログイン｜SmartShop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'ec_site/css/smartshop.css' %}" />
+  <style>body{background:var(--ink);display:flex;align-items:center;justify-content:center;min-height:100vh;}</style>
+</head>
+<body>
+  <main class="formcard" style="padding:34px;">
+    <div class="brand-top" style="margin:0 0 6px;">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3h2.2l1.3 12.1a1.5 1.5 0 0 0 1.5 1.34h9.1a1.5 1.5 0 0 0 1.46-1.14L21 7.2H6.1" stroke="#22303f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="#ff7a45"/><circle cx="17.5" cy="20" r="1.6" fill="#ff7a45"/></svg>
+      <span class="wm" style="font-size:22px;"><span class="a1">Smart</span><span class="a2">Shop</span></span>
+    </div>
+    <div style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--ink-soft);background:var(--cream-2);padding:4px 10px;border-radius:999px;margin:14px 0 22px;">
+      <svg viewBox="0 0 24 24" fill="none" width="13" height="13"><path d="M12 3 5 6v5c0 4 3 7 7 9 4-2 7-5 7-9V6l-7-3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>管理者専用
+    </div>
+    <form method="POST" novalidate>
+      {% csrf_token %}
+      {% if login_form.non_field_errors %}<div class="errbox">{% for e in login_form.non_field_errors %}{{ e }}{% endfor %}</div>{% endif %}
+      <div class="field"><label for="id_admin_id">管理者ID</label>{{ login_form.admin_id }}</div>
+      <div class="field"><label for="id_password">パスワード</label>{{ login_form.password }}</div>
+      <button type="submit" class="btn btn-primary btn-block">ログイン</button>
+    </form>
+    <p style="text-align:center;margin:18px 0 0;font-size:12.5px;"><a href="/ec_site/userLogin/" style="color:var(--ink-soft);">← 一般会員ログインへ</a></p>
+  </main>
+</body>
 </html>

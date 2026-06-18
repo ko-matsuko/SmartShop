@@ -1,20 +1,15 @@
-{% load static %}
-<html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>商品修正</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'ec_site/css/style.css' %}" />
-</head>
-<body>
-    <h1>商品修正</h1>
-    <form method="POST">
-        {% csrf_token %}
-        <table border="1">
-            {{ form.as_table }}
-        </table>
-        <input type="submit" value="更新">
-    </form>
-    <br>
-    <a href="/ec_site/adminItemList/">商品一覧へ戻る</a>
-</body>
-</html>
+{% extends "ec_site/base_admin.html" %}
+{% block title %}商品の編集｜SmartShop 管理{% endblock %}
+{% block heading %}商品の編集{% endblock %}
+{% block nav_items %}on{% endblock %}
+{% block content %}
+<nav class="crumb"><a href="/ec_site/adminItemList/">商品一覧</a> › 商品の編集（ID: {{ item_id }}）</nav>
+<form class="formcard-admin" method="POST" action="/ec_site/adminItemUpdate/{{ item_id }}/" novalidate>
+  {% csrf_token %}
+  {% include "ec_site/_item_form_fields.html" %}
+  <div class="formfoot">
+    <a class="btn btn-secondary" href="/ec_site/adminItemList/">キャンセル</a>
+    <button type="submit" class="btn btn-primary" style="flex:1;">変更を保存する</button>
+  </div>
+</form>
+{% endblock %}

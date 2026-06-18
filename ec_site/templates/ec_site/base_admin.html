@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}SmartShop 管理{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'ec_site/css/smartshop.css' %}" />
+</head>
+<body>
+  <div class="admin-body">
+    <aside class="side">
+      <div class="brand">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3h2.2l1.3 12.1a1.5 1.5 0 0 0 1.5 1.34h9.1a1.5 1.5 0 0 0 1.46-1.14L21 7.2H6.1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="#ff7a45"/><circle cx="17.5" cy="20" r="1.6" fill="#ff7a45"/></svg>
+        <span class="wm"><span class="a1">Smart</span><span class="a2">Shop</span></span><span class="tag">ADMIN</span>
+      </div>
+      <nav class="navi">
+        <a class="{% block nav_main %}{% endblock %}" href="/ec_site/adminMain/"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>ダッシュボード</a>
+        <a class="{% block nav_items %}{% endblock %}" href="/ec_site/adminItemList/"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>商品一覧</a>
+        <a class="{% block nav_create %}{% endblock %}" href="/ec_site/adminItemCreate/"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>商品登録</a>
+        <a class="{% block nav_log %}{% endblock %}" href="/ec_site/adminPurchaseLog/"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4zM4 9h16M9 13h7M9 16h7" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>購入履歴</a>
+      </nav>
+      <div class="bottom navi"><a href="/ec_site/adminLogout/"><svg viewBox="0 0 24 24" fill="none"><path d="M15 12H4m0 0 4-4m-4 4 4 4M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>ログアウト</a></div>
+    </aside>
+
+    <div class="admin-main">
+      <div class="topbar">
+        <h1>{% block heading %}{% endblock %}</h1>
+        <div class="who2"><span>管理者 {{ request.session.admin_id }} さん</span><span class="ava">{{ request.session.admin_id|slice:":1"|upper }}</span></div>
+      </div>
+      <div class="content">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

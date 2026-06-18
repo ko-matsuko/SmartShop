@@ -1,26 +1,58 @@
 {% load static %}
-<html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<title>会員登録</title>
-		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-	</head>
-    <body>
-        <h1>会員情報を入力してください。</h1>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>新規会員登録｜SmartShop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'ec_site/css/smartshop.css' %}" />
+</head>
+<body>
+  <div class="auth">
+    <a class="brand-top" href="/ec_site/">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3h2.2l1.3 12.1a1.5 1.5 0 0 0 1.5 1.34h9.1a1.5 1.5 0 0 0 1.46-1.14L21 7.2H6.1" stroke="#22303f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="#ff7a45"/><circle cx="17.5" cy="20" r="1.6" fill="#ff7a45"/></svg>
+      <span class="wm"><span class="a1">Smart</span><span class="a2">Shop</span></span>
+    </a>
+    <div style="text-align:center;margin:0 0 22px;">
+      <h1 style="font-size:22px;font-weight:700;margin:0 0 4px;">はじめまして</h1>
+      <p style="font-size:13px;color:var(--ink-soft);margin:0;">かんたん登録で、お買い物をはじめましょう</p>
+    </div>
 
-        <div class="register_user">
-            <form action="{% url 'ec_site:register_user' %}" method="POST">
-                {% csrf_token %}
-                <table border="1">
-                    {% for field in form %}
-                    <tr>
-                        <th>{{field.label}}</th>
-                        <td>{{field}}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                <input type="submit" value="登録確認">
-            </form>
+    <main class="formcard">
+      <form method="POST" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="errbox">{% for e in form.non_field_errors %}{{ e }}<br>{% endfor %}</div>
+        {% endif %}
+        <div class="field">
+          <label for="id_user_id">会員ID</label>
+          {{ form.user_id }}
+          {% if form.user_id.errors %}<div class="errbox" style="margin-top:6px;">{{ form.user_id.errors|striptags }}</div>{% endif %}
         </div>
-        <a href="/ec_site/">商品検索</a>へ<br>
-    </body>
+        <div class="field">
+          <label for="id_password">パスワード</label>
+          {{ form.password }}
+        </div>
+        <div class="field">
+          <label for="id_password_check">パスワード（確認用）</label>
+          {{ form.password_check }}
+        </div>
+        <div class="field">
+          <label for="id_name">お名前</label>
+          {{ form.name }}
+        </div>
+        <div class="field">
+          <label for="id_address">ご住所</label>
+          {{ form.address }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">この内容で確認する</button>
+      </form>
+    </main>
+
+    <p class="foot-link">すでに会員の方は <a href="/ec_site/userLogin/">ログイン</a></p>
+  </div>
+</body>
+</html>

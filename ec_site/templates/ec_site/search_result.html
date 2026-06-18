@@ -1,38 +1,19 @@
-{% load static %}
-<html>
-	<head>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<title>商品検索結果</title>
-		<link rel='stylesheet' type='text/css' href='{% static "ec_site/css/style.css" %}' />
-	</head>
-    <body>
-        <h1>キーワード "{{keyword}}" カテゴリ"{{category}}"の検索結果</h1>
-
-		<div class="content">
-			{% csrf_token %}
-			<div class="item_list">
-				<table border="1">
-					<tr>
-						<th>商品名</th>
-						<th>商品の色</th>
-						<th>メーカー名</th>
-						<th>価格</th>
-					</tr>
-					{% for item in item_list %}
-					<tr>
-						<td><a href="/ec_site/itemDetail/{{item.item_id}}">{{item.name}}</a></td>
-						<td>{{item.color}}</td>
-						<td>{{item.manufacturer}}</td>
-						<td>{{item.price}}</td>
-					</tr>
-					{% endfor %}
-				</table>
-			</div>
-
-			<br>
-			<div class="link">
-				<a href="/ec_site/">商品検索</a>へ<br><br>
-			</div>
-			
-		</div>
-    </body>
+{% extends "ec_site/base_store.html" %}
+{% block title %}検索結果｜SmartShop{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="results-head">
+    <div>
+      <div class="h">{% if keyword %}「<em>{{ keyword }}</em>」の検索結果{% else %}{{ category }}の商品{% endif %}</div>
+      <div class="c">{{ item_list|length }}件の商品</div>
+    </div>
+  </div>
+  <div class="grid">
+    {% for item in item_list %}
+      {% include "ec_site/_pcard.html" %}
+    {% empty %}
+      <div class="empty">該当する商品が見つかりませんでした。<br>キーワードや条件を変えてお試しください。</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

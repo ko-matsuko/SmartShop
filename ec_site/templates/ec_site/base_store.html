@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}SmartShop{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'ec_site/css/smartshop.css' %}" />
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+  <header class="ss-header">
+    <div class="ss-bar">
+      <a class="ss-logo" href="/ec_site/">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3h2.2l1.3 12.1a1.5 1.5 0 0 0 1.5 1.34h9.1a1.5 1.5 0 0 0 1.46-1.14L21 7.2H6.1" stroke="#22303f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="#ff7a45"/><circle cx="17.5" cy="20" r="1.6" fill="#ff7a45"/></svg>
+        <span class="wm"><span class="a1">Smart</span><span class="a2">Shop</span></span>
+      </a>
+
+      <form class="ss-search" action="{% url 'ec_site:search_result' %}" method="POST">
+        {% csrf_token %}
+        <select class="cat" name="category">
+          <option value="0">すべて</option>
+          {% for c in category_list %}<option value="{{ c.category_id }}">{{ c.name }}</option>{% endfor %}
+        </select>
+        <input type="text" name="keyword" placeholder="ほしいモノを検索（例：トートバッグ）" />
+        <button class="go" type="submit" aria-label="検索"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#fff" stroke-width="2"/><path d="m20 20-3.2-3.2" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></button>
+      </form>
+
+      <div class="ss-acts">
+        {% if request.session.is_login %}
+          <div class="acctmenu" id="acctMenu">
+            <button class="acct-btn" id="acctBtn" type="button">
+              <span class="ava">{{ request.session.name|slice:":1" }}</span>
+              <span class="who"><span>こんにちは</span><b>{{ request.session.name }} さん</b></span>
+              <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="menu">
+              <div class="mhead"><b>{{ request.session.name }}</b><span>{{ request.session.user_id }}</span></div>
+              <a href="/ec_site/userInfo/"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="1.8"/><path d="M4 21a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>会員情報の確認</a>
+              <a href="/ec_site/updateUserInfo/"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20h4L18.5 9.5a2 2 0 0 0-3-3L5 17v3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>会員情報の変更</a>
+              <div class="sep"></div>
+              <a class="logout" href="/ec_site/userLogout/"><svg viewBox="0 0 24 24" fill="none"><path d="M15 12H4m0 0 4-4m-4 4 4 4M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>ログアウト</a>
+            </div>
+          </div>
+        {% else %}
+          <a class="login-link" href="/ec_site/userLogin/"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="1.8"/><path d="M4 21a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>ログイン</a>
+        {% endif %}
+
+        <a class="cart-link" href="/ec_site/cart/">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3h2.2l1.3 12.1a1.5 1.5 0 0 0 1.5 1.34h9.1a1.5 1.5 0 0 0 1.46-1.14L21 7.2H6.1" stroke="#22303f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.5" fill="#22303f"/><circle cx="17.5" cy="20" r="1.5" fill="#22303f"/></svg>
+          <span class="label">カート</span>
+        </a>
+
+        <a class="admin-link" href="/ec_site/adminLogin/"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 5 6v5c0 4 3 7 7 9 4-2 7-5 7-9V6l-7-3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>管理者</a>
+      </div>
+    </div>
+  </header>
+
+  {% block content %}{% endblock %}
+
+  <script>
+    // アカウントメニューの開閉
+    (function(){
+      var m = document.getElementById('acctMenu');
+      if(!m) return;
+      var b = document.getElementById('acctBtn');
+      b.addEventListener('click', function(e){ e.stopPropagation(); m.classList.toggle('open'); });
+      document.addEventListener('click', function(){ m.classList.remove('open'); });
+    })();
+  </script>
+  {% block body_extra %}{% endblock %}
+</body>
+</html>
